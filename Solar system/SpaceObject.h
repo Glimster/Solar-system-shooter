@@ -1,9 +1,10 @@
 #pragma once
 
+#include "SceneNode.h"
+
 class CoordinateSystemHandler;
 
-// TODO, byt namn till t.ex. RigidObject?
-class SpaceObject
+class SpaceObject : public SceneNode
 {
 public:
   SpaceObject( float mass,
@@ -30,10 +31,8 @@ public:
   virtual void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const { fOverM.setZero(); };
   virtual float computeTorque() const { return 0.0f; };
 
-  // TODO, varför är dessa virtuella, det är ju samma implementation i de ärvda klasserna!?
-  // Kanske ska vara pure virtual?
-  virtual void updateGraphics(); 
-  virtual void render( sf::RenderWindow& renderWindow ) const;
+  // TODO, det här måste funderas på:
+  virtual void updateGraphics() = 0; 
 
 protected:
   const CoordinateSystemHandler& csHandler_;

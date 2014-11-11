@@ -14,9 +14,9 @@ Game::Game(void):
   space_( mainWindow_ ),
   clock_(),
   totalTime_( sf::Time::Zero ),
-  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) ), // TODO: how high can this value be set?
-  maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 100.0f ),
-  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 10.0f )
+  maxTimeStep_( sf::seconds( 1.0f / 60.0f ) ), // TODO: how high can this value be set?
+  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 100.0f ),
+  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 10.0f ),
   // Debug
   font_(),
   debugText_(),
@@ -115,27 +115,27 @@ void Game::renderDebugPrintouts_()
     // Object data
     const vector< SpaceObject* >& spaceObjects = space_.getSpaceObjects();
     for( size_t i = 0; i < spaceObjects.size() - 1; ++i ) {
-      Planet p = *dynamic_cast< Planet* >( spaceObjects[i] );
-      Eigen::Vector2f pos = p.getPosition();
+      //Planet p = *dynamic_cast< Planet* >( spaceObjects[i] );
+      Eigen::Vector2f pos = spaceObjects[i]->getPosition();
 
-      float speed = sqrt( p.getVelocity()(0) * p.getVelocity()(0) + p.getVelocity()(1) * p.getVelocity()(1) );
+      float speed = sqrt( spaceObjects[i]->getVelocity()( 0 ) * spaceObjects[i]->getVelocity()( 0 ) + spaceObjects[i]->getVelocity()( 1 ) * spaceObjects[i]->getVelocity()( 1 ) );
       speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
-      theString.append( p.getName() + " v = " + to_string( speed ) + " km/s" );
+      theString.append( /*p.getName() + */" v = " + to_string( speed ) + " km/s" );
 
-      float position = sqrt( p.getPosition()(0) * p.getPosition()(0) + p.getPosition()(1) * p.getPosition()(1) );
+      float position = sqrt( spaceObjects[i]->getPosition()( 0 ) * spaceObjects[i]->getPosition()( 0 ) + spaceObjects[i]->getPosition()( 1 ) * spaceObjects[i]->getPosition()( 1 ) );
       theString.append( ",  pos = " + to_string( position ) + " au" );
 
       theString.append( "\n" );
     }
 
-    StarShip ship = *dynamic_cast< StarShip* >( spaceObjects[spaceObjects.size() - 1] );
-    Eigen::Vector2f pos = ship.getPosition();
+    //StarShip ship = *dynamic_cast< StarShip* >( spaceObjects[spaceObjects.size() - 1] );
+    Eigen::Vector2f pos = spaceObjects[spaceObjects.size() - 1]->getPosition();
 
-    float speed = sqrt( ship.getVelocity()(0) * ship.getVelocity()(0) + ship.getVelocity()(1) * ship.getVelocity()(1) );
+    float speed = sqrt( spaceObjects[spaceObjects.size() - 1]->getVelocity()( 0 ) * spaceObjects[spaceObjects.size() - 1]->getVelocity()( 0 ) + spaceObjects[spaceObjects.size() - 1]->getVelocity()( 1 ) * spaceObjects[spaceObjects.size() - 1]->getVelocity()( 1 ) );
     speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
     theString.append( "Player 1: v = " + to_string( speed ) + " km/s" );
 
-    float position = sqrt( ship.getPosition()(0) * ship.getPosition()(0) + ship.getPosition()(1) * ship.getPosition()(1) );
+    float position = sqrt( spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) + spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) );
     theString.append( ",  pos = " + to_string( position ) + " au" );
 
     theString.append( "\n" );

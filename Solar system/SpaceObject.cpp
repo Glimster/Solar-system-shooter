@@ -63,9 +63,3 @@ void SpaceObject::rotate( float angle )
     orientation_(1) = newY;
   }
 }
-
-void SpaceObject::updateGraphics()
-{}
-
-void SpaceObject::render( sf::RenderWindow& renderWindow ) const
-{}

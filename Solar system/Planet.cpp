@@ -7,15 +7,12 @@
 using namespace std;
 
 Planet::Planet( const std::string& name, float mass, float radius,
-                Textures::ID textureID, // TODO, perhaps not so nice?
                 const TextureHolder& textureHolder,
                 const CoordinateSystemHandler& csHandler ):
   SpaceObject( mass, csHandler ),
   name_( name ),
-  sprite_()
+  sprite_( textureHolder.get( toTextureID_()) )
 {
-  sprite_.setTexture( textureHolder.get( textureID ) );
-    
   const float scaleX = radius * csHandler_.unitOfLength2Pixel() * 2.0f / sprite_.getTextureRect().width;
   const float scaleY = radius * csHandler_.unitOfLength2Pixel() * 2.0f / sprite_.getTextureRect().height;
   sprite_.setScale( scaleX, scaleY );
@@ -35,7 +32,52 @@ void Planet::updateGraphics()
   sprite_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
 }
 
-void Planet::render( sf::RenderWindow& renderWindow ) const
+void Planet::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
-  renderWindow.draw( sprite_ );
+  target.draw( sprite_, states );
+}
+
+Textures::ID Planet::toTextureID_() const
+{
+  if( name_ == "Mercury" )
+  {
+    return Textures::ID::Mercury;
+  }
+  else if( name_ == "Venus" )
+  {
+    return Textures::ID::Venus;
+  }
+  else if( name_ == "Earth" )
+  {
+    return Textures::ID::Earth;
+  }
+  else if( name_ == "Mars" )
+  {
+    return Textures::ID::Mars;
+  }
+  else if( name_ == "Jupiter" )
+  {
+    return Textures::ID::Jupiter;
+  }
+  else if( name_ == "Saturn" )
+  {
+    return Textures::ID::Saturn;
+  }
+  else if( name_ == "Uranus" )
+  {
+    return Textures::ID::Uranus;
+  }
+  else if( name_ == "Neptune" )
+  {
+    return Textures::ID::Neptune;
+  }
+  else if( name_ == "Sun" )
+  {
+    return Textures::ID::Sun;
+  }
+  else
+  {
+    assert( false );
+    return Textures::ID::Sun;
+  }
 }

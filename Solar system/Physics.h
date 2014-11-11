@@ -29,5 +29,12 @@ public:
 
   // Rotation inertia around z at center of rectangle
   static float computeRotationalInertiaForRectangle( float mass, float a, float b );
+
+  // Computes the velocity of a satellite in circular orbit around a large central mass
+  // The velocity will be perpendicular to the relative position vector 
+  static Eigen::Vector2f circularOrbitVelocity( const Eigen::Vector2f& relPos, float centralMass );
+  
+  // Computes the escape velocity (really the speed) of a satellite around a large central mass
+  static float escapeVelocity( const Eigen::Vector2f& relPos, float centralMass );
 };
 

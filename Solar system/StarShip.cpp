@@ -8,17 +8,15 @@
 using namespace std;
 
 StarShip::StarShip( float mass, 
-                    Textures::ID textureID, 
                     const TextureHolder& textureHolder,
                     const CoordinateSystemHandler& csHandler ):
   SpaceObject( mass, csHandler ),
+  sprite_( textureHolder.get( Textures::ID::StarShip ) ),
   aftThrusters_( false ),
   leftRotationThrusters_( false ),
   rightRotationThrusters_( false )
 {
-  sprite_.setTexture( textureHolder.get( textureID ) );
-
-  const float shipLength = 2000.0f * 12.756e6f / Phys::PhysicalConstants::au2m; // TODO, how big should it be?
+  const float shipLength = 0.17f; // au, TODO, how big should it be?
   const float shipWidth = shipLength * sprite_.getTextureRect().height / sprite_.getTextureRect().width;
   const float scaleX = shipLength * csHandler_.unitOfLength2Pixel() / sprite_.getTextureRect().width;
   const float scaleY = shipWidth * csHandler_.unitOfLength2Pixel() / sprite_.getTextureRect().height;
@@ -44,9 +42,9 @@ void StarShip::updateGraphics()
   sprite_.setRotation( angleInDisplayCS );
 }
 
-void StarShip::render( sf::RenderWindow& renderWindow ) const
+void StarShip::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
-  renderWindow.draw( sprite_ );
+  target.draw( sprite_, states );
 }
 
 void StarShip::computeLinearForce( Eigen::Vector2f& force ) const

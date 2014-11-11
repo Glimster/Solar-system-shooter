@@ -165,10 +165,12 @@
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="MathUtil.h" />
     <ClInclude Include="PhysicalConstants.h" />
+    <ClInclude Include="PhysicalData.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="ResourceHolder.h" />
     <ClInclude Include="ResourceIdentifiers.h" />
+    <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Space.h" />
     <ClInclude Include="SpaceObject.h" />
     <ClInclude Include="StarShip.h" />
@@ -182,8 +184,10 @@
     <ClCompile Include="Integrator.cpp" />
     <ClCompile Include="MathUtil.cpp" />
     <ClCompile Include="PhysicalConstants.cpp" />
+    <ClCompile Include="PhysicalData.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Planet.cpp" />
+    <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Solar system shooter.cpp" />
     <ClCompile Include="Space.cpp" />
     <ClCompile Include="SpaceObject.cpp" />

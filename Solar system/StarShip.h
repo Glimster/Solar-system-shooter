@@ -7,14 +7,13 @@ class StarShip : public SpaceObject
 {
 public:
   StarShip( float mass,
-            Textures::ID textureID,
             const TextureHolder& textureHolder,
             const CoordinateSystemHandler& csHandler );
   
   ~StarShip();
 
   void updateGraphics();
-  void render( sf::RenderWindow& renderWindow ) const;
+  void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
 
   void computeLinearForce( Eigen::Vector2f& force ) const; // TODO, ta bort
   void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const;
