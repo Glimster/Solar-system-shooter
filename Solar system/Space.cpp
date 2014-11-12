@@ -21,8 +21,6 @@ Space::Space( sf::RenderWindow& mainWindow ):
   sceneGraph_(),
   spaceObjects_(),
   player_()
-  //planets_(),
-  //player__()
 {
   {
     const float earthToSun = 1.0; // au
@@ -177,15 +175,7 @@ void Space::render()
 {
   mainWindow_.setView( playerView_ );
 
-  //for( const unique_ptr< Planet >& p : planets_ )
-  //{
-  //  p->updateGraphics(); // TODO: not so nice, when to update sprite/shape?
-  //  p->render( mainWindow_ );
-  //}
-  //
-  //player_->updateGraphics(); // TODO: not so nice, when to update sprite/shape?
-  //player_->render( mainWindow_ );
-  
+  // TODO, perhaps not so nice, consider alternative
   for( SpaceObject* obj : spaceObjects_ )
   {
     obj->updateGraphics();
@@ -248,7 +238,6 @@ void Space::buildScene_()
     
     spaceObjects_.push_back( planet.get() );
 
-    //planets_.push_back( std::move( planet ) );
     sceneLayers_[ActionLayer]->attachChild( std::move( planet ) );
   }
 
@@ -260,12 +249,6 @@ void Space::buildScene_()
     player->setOrientation( Eigen::Vector2f( 1.0f, 0.0f ) );
 
     player_ = player.get();
-    
-    //player__ = unique_ptr< StarShip >( new StarShip( mass, textureHolder_, csHandler_ ) );
-    //player__->setPosition( Eigen::Vector2f( 1.0f, 1.0f ) );
-    //player__->setVelocity( Eigen::Vector2f( 0.0f, 0.0f ) );
-    //player__->setOrientation( Eigen::Vector2f( 1.0f, 0.0f ) );
-    //spaceObjects_.push_back( player__.get() );
 
     spaceObjects_.push_back( player.get() );
     sceneLayers_[ActionLayer]->attachChild( std::move( player ) );

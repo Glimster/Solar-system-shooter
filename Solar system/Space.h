@@ -47,8 +47,5 @@ private:
 
   std::vector< SpaceObject* > spaceObjects_; // Should contain all space objects
   StarShip* player_;
-
-  //std::vector< std::unique_ptr< Planet > > planets_;
-  //std::unique_ptr< StarShip > player__;
 };
 
