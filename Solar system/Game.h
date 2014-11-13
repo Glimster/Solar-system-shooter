@@ -1,5 +1,6 @@
 #pragma once
 #include "Space.h"
+#include "Player.h"
 
 class Game : sf::NonCopyable
 {
@@ -20,13 +21,16 @@ private:
   void setupDebug_();
   void updateFPSStats_( const sf::Time& elapsedTime );
   void renderDebugPrintouts_();
+  std::string boolToString_( bool b ) const { return b ? "true" : "false"; }
 
   sf::RenderWindow mainWindow_;
   sf::View GUIView_;
 
   Space space_;
 
-  //bool initialized_;
+  Player player_;
+
+  bool isPaused_;
 
   sf::Clock clock_;
   sf::Time totalTime_;

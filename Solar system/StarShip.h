@@ -23,6 +23,9 @@ public:
   void setLeftRotationThrusters( bool thrusters ) { leftRotationThrusters_ = thrusters; }
   void setRightRotationThrusters( bool thrusters ) { rightRotationThrusters_ = thrusters; }
 
+  unsigned int getCategory() const;
+
+  friend class Game;
 private:
   sf::Sprite sprite_;
 

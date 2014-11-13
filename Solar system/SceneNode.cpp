@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "SceneNode.h"
 
+#include "Command.h"
+#include "Category.h"
+
 using namespace std;
 
 SceneNode::SceneNode():
@@ -26,6 +29,25 @@ SceneNode::Ptr SceneNode::detachChild( const SceneNode& node )
   children_.erase( found );
 
   return result;
+}
+
+void SceneNode::onCommand( const Command& command )
+{
+  // NB, bitwise and intentional!
+  if( getCategory() & command.category )
+  {
+    command.action( *this );
+  }
+
+  for( Ptr& child : children_ )
+  {
+    child->onCommand( command );
+  }
+}
+
+unsigned int SceneNode::getCategory() const
+{
+  return Category::Scene;
 }
 
 void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const

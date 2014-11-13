@@ -4,6 +4,7 @@
 #include "ResourceIdentifiers.h"
 #include "CoordinateSystemHandler.h"
 #include "SceneNode.h"
+#include "CommandQueue.h"
 
 class SpaceObject;
 class StarShip;
@@ -18,6 +19,8 @@ public:
   void update( const sf::Time& timeStep );
   void render();
 
+  CommandQueue& getCommandQueue() { return commandQueue_; }
+
   // TODO, remove, for debug!
   const std::vector< SpaceObject* >& getSpaceObjects() const { return spaceObjects_; } 
 
@@ -29,8 +32,6 @@ private:
     LayerCount
   };
 
-  void handlePlayerInput_( sf::Keyboard::Key key, bool isPressed ); // TODO, ska den här ligga nån annan stans?
-
   void loadTextures_();
   void buildScene_();
 
@@ -38,6 +39,8 @@ private:
   CoordinateSystemHandler csHandler_;
   TextureHolder textureHolder_;
   sf::View playerView_;
+
+  CommandQueue commandQueue_;
 
   // sceneGraph_ owns all SceneNodes (i.e. SpaceObjects) as children (and grandchildren etc.)
   // sceneLayers keeps pointers to the top SceneNode for each layer

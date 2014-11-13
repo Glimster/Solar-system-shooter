@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="Category.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="CoordinateSystemHandler.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Integrator.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="PhysicalData.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Planet.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceHolder.h" />
     <ClInclude Include="ResourceIdentifiers.h" />
     <ClInclude Include="SceneNode.h" />
@@ -179,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="CoordinateSystemHandler.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Integrator.cpp" />
@@ -187,6 +190,7 @@
     <ClCompile Include="PhysicalData.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Planet.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Solar system shooter.cpp" />
     <ClCompile Include="Space.cpp" />

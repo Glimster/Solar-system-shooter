@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Command.h"
 
+#include "Category.h"
 
-Command::Command(void)
-{
-}
+Command::Command():
+  action(),
+  category( Category::None )
+{}

@@ -17,6 +17,7 @@ Space::Space( sf::RenderWindow& mainWindow ):
   csHandler_(),
   textureHolder_(),
   playerView_(),
+  commandQueue_(),
   sceneLayers_(),
   sceneGraph_(),
   spaceObjects_(),
@@ -47,35 +48,16 @@ Space::Space( sf::RenderWindow& mainWindow ):
 Space::~Space()
 {}
 
-void Space::processEvents()
-{
-  sf::Event event;
-  while( mainWindow_.pollEvent( event ) )
-  {
-    switch( event.type ) 
-    {
-      case sf::Event::KeyPressed:
-      {
-        handlePlayerInput_( event.key.code, true );
-        break;
-      }
-      case sf::Event::KeyReleased:
-      {
-        handlePlayerInput_( event.key.code, false );
-        break;
-      }
-      case sf::Event::Closed:
-      {
-        mainWindow_.close();
-        break;
-      }
-    }
-  }
-}
-
 void Space::update( const sf::Time& timeStep )
 {
   const float dt = timeStep.asSeconds();
+
+  // TODO, frågan är om jag kan stoppa den här nån annanstans, t.ex. utanför inre fysik-loopen,
+  // eftersom jag inte använder dt!?!?!?
+  while( !commandQueue_.isEmpty() )
+  {
+    sceneGraph_.onCommand( commandQueue_.pop() );
+  }
 
   // TODO, städa upp detta och lägg på lämplig plats:
   enum class Integration { EulerForward, RK4 };
@@ -181,22 +163,6 @@ void Space::render()
     obj->updateGraphics();
   }
   mainWindow_.draw( sceneGraph_ );
-}
-
-void Space::handlePlayerInput_( sf::Keyboard::Key key, bool isPressed )
-{
-  if( key == sf::Keyboard::Up )
-  {
-    player_->setAftThrusters( isPressed );
-  }
-  else if( key == sf::Keyboard::Left )
-  {
-    player_->setLeftRotationThrusters( isPressed );
-  }
-  else if( key == sf::Keyboard::Right )
-  {
-    player_->setRightRotationThrusters( isPressed );
-  }
 }
 
 void Space::loadTextures_()

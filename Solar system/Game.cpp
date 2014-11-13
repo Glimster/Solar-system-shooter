@@ -12,6 +12,7 @@ Game::Game(void):
   mainWindow_( sf::VideoMode::getDesktopMode(), "Solar System" ),
   GUIView_( mainWindow_.getDefaultView() ),
   space_( mainWindow_ ),
+  isPaused_( false ),
   clock_(),
   totalTime_( sf::Time::Zero ),
   maxTimeStep_( sf::seconds( 1.0f / 60.0f ) ), // TODO: how high can this value be set?
@@ -49,7 +50,8 @@ void Game::run()
     
     while( timeSinceLastUpdate >= dt ) {
       //processEvents(); // Behöver denna verkligen göras så ofta? Det här har ju att göra med physik juh!
-      update( dt );
+      if( !isPaused_ )
+        update( dt ); 
 
       timeSinceLastUpdate -= dt;
       totalTime_ += dt;
@@ -69,8 +71,34 @@ void Game::run()
 
 void Game::processEvents()
 {
-  // Ska inte Game sköta detta, inte Space!?
-  space_.processEvents();
+  CommandQueue& commands = space_.getCommandQueue();
+
+  sf::Event event;
+  while( mainWindow_.pollEvent( event ) )
+  {
+    player_.handleEvent( event, commands );
+
+    switch( event.type )
+    {
+      case sf::Event::LostFocus:
+      {
+        isPaused_ = true;
+        break;
+      }
+      case sf::Event::GainedFocus:
+      {
+        isPaused_ = false;
+        break;
+      }
+      case sf::Event::Closed:
+      {
+        mainWindow_.close();
+        break;
+      }
+    }
+  }
+
+  player_.handleRealtimeInput( commands );
 }
 
 void Game::update( const sf::Time& timeStep )
@@ -115,12 +143,11 @@ void Game::renderDebugPrintouts_()
     // Object data
     const vector< SpaceObject* >& spaceObjects = space_.getSpaceObjects();
     for( size_t i = 0; i < spaceObjects.size() - 1; ++i ) {
-      //Planet p = *dynamic_cast< Planet* >( spaceObjects[i] );
       Eigen::Vector2f pos = spaceObjects[i]->getPosition();
 
       float speed = sqrt( spaceObjects[i]->getVelocity()( 0 ) * spaceObjects[i]->getVelocity()( 0 ) + spaceObjects[i]->getVelocity()( 1 ) * spaceObjects[i]->getVelocity()( 1 ) );
       speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
-      theString.append( /*p.getName() + */" v = " + to_string( speed ) + " km/s" );
+      theString.append( dynamic_cast<Planet*>( spaceObjects[i] )->getName() + " v = " + to_string( speed ) + " km/s" );
 
       float position = sqrt( spaceObjects[i]->getPosition()( 0 ) * spaceObjects[i]->getPosition()( 0 ) + spaceObjects[i]->getPosition()( 1 ) * spaceObjects[i]->getPosition()( 1 ) );
       theString.append( ",  pos = " + to_string( position ) + " au" );
@@ -137,6 +164,10 @@ void Game::renderDebugPrintouts_()
 
     float position = sqrt( spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) + spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) );
     theString.append( ",  pos = " + to_string( position ) + " au" );
+
+    theString.append( ", ft = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->aftThrusters_ ) );
+    theString.append( ", lt = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->leftRotationThrusters_ ) );
+    theString.append( ", rt = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->rightRotationThrusters_ ) );
 
     theString.append( "\n" );
 

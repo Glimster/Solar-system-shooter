@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "StarShip.h"
 
+#include "Category.h"
 #include "CoordinateSystemHandler.h"
 #include "ResourceHolder.h"
 #include "Physics.h"
@@ -87,4 +88,9 @@ float StarShip::computeTorque() const
   }
 
   return torque;
+}
+
+unsigned int StarShip::getCategory() const
+{
+  return Category::Player;
 }
