@@ -77,7 +77,7 @@ Textures::ID Planet::toTextureID_() const
   }
   else
   {
-    assert( false );
+    throw invalid_argument( "Missing texture " + name_ );
     return Textures::ID::Sun;
   }
 }

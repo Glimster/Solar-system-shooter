@@ -50,7 +50,7 @@ void Game::run()
     
     while( timeSinceLastUpdate >= dt ) {
       //processEvents(); // Behöver denna verkligen göras så ofta? Det här har ju att göra med physik juh!
-      if( !isPaused_ )
+      if( !isPaused_ ) // Ska man inte göra så att tiden också stannar när det är pausat?
         update( dt ); 
 
       timeSinceLastUpdate -= dt;
