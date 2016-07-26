@@ -4,6 +4,34 @@
 class MathUtil
 {
 public:
+
+  // Ellipses
+  // a - semi major axis
+  // b - semi minor axis
+  
+  static float fociCenterDistanceEllipse( float a, float b );
+  static float areaEllipse( float a, float b );
+
+  // Ramanujan approximation, 
+  // se https://www.mathsisfun.com/geometry/ellipse-perimeter.html
+  static float circumferenceEllipse( float a, float b );
+  
+
+  // C++11 baby!
+  template< typename VecType >
+  inline static auto angleBetween( const VecType& v1, VecType& v2 ) -> decltype( v1.norm() )
+  {
+    return acos( v1.dot( v2 ) / ( v1.norm() * v2.norm() ) );
+  }
+
+  // Eigen extensions
+  template< typename VecType >
+  inline static auto cross2D( const VecType& v1, VecType& v2 ) -> decltype( v1.norm() )
+  {
+    return abs( v1( 0 ) * v2( 1 ) - v1( 1 ) * v2( 0 ) );
+  }
+  
+  // 
   template< typename FuncType >
   inline static float forwardEulerStep1d( FuncType derivative,
                                           const float dt )

@@ -7,7 +7,6 @@
 #include "PhysicalData.h"
 #include "PhysicalConstants.h"
 #include "MathUtil.h"
-
 #include "Integrator.h"
 
 using namespace std;
@@ -17,6 +16,7 @@ Space::Space( sf::RenderWindow& mainWindow ):
   csHandler_(),
   textureHolder_(),
   playerView_(),
+  motionManager_( MotionManager::Integration::EulerForward, MotionManager::Technique::functor ),
   commandQueue_(),
   sceneLayers_(),
   sceneGraph_(),
@@ -63,52 +63,8 @@ void Space::update( const sf::Time& timeStep )
   enum class Integration { EulerForward, RK4 };
   enum class Technique { standard, lambda, functor };
 
-  { // Linear motion
-    Integration integration = Integration::EulerForward;
-    Technique technique = Technique::functor;
-
-    vector< Eigen::Vector2f > drs, dvs;
-    switch( technique )
-    {
-      case( Technique::standard ):
-      {
-        if( integration == Integration::EulerForward ) {
-          MathUtil::eulerStep( spaceObjects_, dt, drs, dvs );
-        }
-        else {
-          assert( integration == Integration::RK4 );
-          MathUtil::RK4Step( spaceObjects_, dt, drs, dvs );
-        }
-        break;
-      }
-      case( Technique::lambda ):
-      {
-        assert( integration != Integration::RK4 );
-        Integrator::N2EulerStepLambdas( spaceObjects_, dt, drs, dvs );
-        break;
-      }
-      case( Technique::functor ):
-      {
-        if( integration == Integration::EulerForward ) {
-          Integrator::N2EulerStepFunctorsState( spaceObjects_, dt, drs, dvs );
-        }
-        else {
-          assert( integration == Integration::RK4 );
-          Integrator::N2RK4StepFunctors( spaceObjects_, dt, drs, dvs );
-        }
-        break;
-      }
-      default:
-        assert( false );
-        break;
-    }
-
-    for( size_t i = 0; i != spaceObjects_.size(); ++i )
-    {
-      spaceObjects_[i]->updateState( drs[i], dvs[i] );
-    }
-  }
-
+  motionManager_.updateLinearMotion( dt, spaceObjects_ );
+  // TODO, stoppa in i MotionManager:
   { // Angular motion
     Integration integration = Integration::EulerForward; // Must be sufficient
     Technique technique = Technique::functor;
@@ -193,7 +149,7 @@ void Space::buildScene_()
 
   vector< PhysicalData::PlanetData > planetData;
   //PhysicalData::setupRealisticSolarSystem( planetData );
-  PhysicalData::setupSolarSystem( planetData );
+  PhysicalData::setupPlanetarySystem( planetData );
   
   for( size_t i = 0; i < planetData.size(); ++i )
   {

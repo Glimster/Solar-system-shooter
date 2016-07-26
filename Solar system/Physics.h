@@ -27,6 +27,17 @@ public:
     F *= -force;
   }
 
+  inline static float kineticEnergy( float m, const Eigen::Vector2f& v )
+  {
+    return m * v.dot( v ) / 2.0f;
+  }
+
+  // Note that the potential energy = 0 for r = oo
+  inline static float gravitationalPotentialEnergy( float m1, float m2, const Eigen::Vector2f& r )
+  {
+    return -Phys::PhysicalConstants::kSquared * m1 * m2 / r.norm();
+  }
+
   // Rotation inertia around z at center of rectangle
   static float computeRotationalInertiaForRectangle( float mass, float a, float b );
 

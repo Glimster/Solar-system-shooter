@@ -5,6 +5,7 @@
 #include "CoordinateSystemHandler.h"
 #include "SceneNode.h"
 #include "CommandQueue.h"
+#include "MotionManager.h"
 
 class SpaceObject;
 class StarShip;
@@ -39,6 +40,8 @@ private:
   CoordinateSystemHandler csHandler_;
   TextureHolder textureHolder_;
   sf::View playerView_;
+
+  MotionManager motionManager_;
 
   CommandQueue commandQueue_;
 

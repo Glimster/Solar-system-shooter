@@ -13,7 +13,12 @@ public:
     Eigen::Vector2f position;
   };
 
-  static void setupSolarSystem( std::vector< PlanetData >& planetData );
+  static void setupHeavySunLightPlanet( std::vector< PlanetData >& planetData );
+  static void setupTwoBodySystem( std::vector< PlanetData >& planetData );
+  static void setupThreeBodySystem( std::vector< PlanetData >& planetData );
+  static void setupPlanetarySystem( std::vector< PlanetData >& planetData );
   static void setupRealisticSolarSystem( std::vector< PlanetData >& planetData );
+
+  static void setupAlotOfPlanets( std::vector< PlanetData >& planetData );
 };
 

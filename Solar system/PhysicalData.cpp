@@ -1,12 +1,103 @@
 #include "stdafx.h"
 #include "PhysicalData.h"
 
+#include <random>
 #include "Physics.h"
 #include "PhysicalConstants.h"
 
 using namespace std;
 
-void PhysicalData::setupSolarSystem( vector< PlanetData >& planetData )
+void PhysicalData::setupHeavySunLightPlanet( vector< PlanetData >& planetData )
+{
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 1.0e3f; // Solar mass
+    data.radius = 0.1f; // au
+    data.velocity = Eigen::Vector2f( 0.0f, 0.0f );
+    data.position = Eigen::Vector2f( 0.0f, 0.0f );
+    planetData.push_back( data );
+  }
+  {
+    PlanetData data;
+    data.name = "Earth";
+    data.mass = 1.0e-10f; // Solar mass
+    data.radius = 0.05f; // au
+    const float distance = 1.0F; // au
+    data.position = Eigen::Vector2f( -distance, 0.0f );
+    data.velocity = Physics::circularOrbitVelocity( data.position, planetData[0].mass ) * 0.5f;
+    //data.velocity = Physics::circularOrbitVelocity( data.position, planetData[0].mass );
+
+    planetData.push_back( data );
+  }
+}
+
+void PhysicalData::setupTwoBodySystem( vector< PlanetData >& planetData )
+{
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 2.0e2f; // Solar mass
+    data.radius = 0.1f; // au
+    const float speed = 0.08f; // au / D
+    data.velocity = Eigen::Vector2f( 0.0f, speed );
+    const float distance = 1.0f; // au
+    data.position = Eigen::Vector2f( -distance, 0.0f );
+    //data.velocity = Physics::circularOrbitVelocity( data.position, 1.0f, data.mass );
+    planetData.push_back( data );
+  }
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 2.0e2f; // Solar mass
+    data.radius = 0.1f; // au
+    const float speed = 0.08f; // au / D
+    data.velocity = Eigen::Vector2f( 0.0f, -speed );
+    const float distance = 1.0f; // au
+    data.position = Eigen::Vector2f( distance, 0.0f );
+    //data.velocity = Physics::circularOrbitVelocity( data.position, 1.0f, data.mass );
+    planetData.push_back( data );
+  }
+}
+
+void PhysicalData::setupThreeBodySystem( vector< PlanetData >& planetData )
+{
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 2.0e2f; // Solar mass
+    data.radius = 0.1f; // au
+    const float speed = 0.08f; // au / D
+    data.velocity = Eigen::Vector2f( speed / 2.0f, speed );
+    const float distance = 1.0f; // au
+    data.position = Eigen::Vector2f( -distance, 0.0f );
+    planetData.push_back( data );
+  }
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 2.0e2f; // Solar mass
+    data.radius = 0.1f; // au
+    const float speed = 0.08f; // au / D
+    data.velocity = Eigen::Vector2f( 0.0f, -speed );
+    const float distance = 1.0f; // au
+    data.position = Eigen::Vector2f( distance, 0.0f );
+    planetData.push_back( data );
+  }
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 2.0e2f; // Solar mass
+    data.radius = 0.1f; // au
+    const float speed = 0.08f; // au / D
+    data.velocity = Eigen::Vector2f( -speed, -speed );
+    const float distance = 1.0f; // au
+    data.position = Eigen::Vector2f( 0.0f, 0.0f );
+    planetData.push_back( data );
+  }
+}
+
+void PhysicalData::setupPlanetarySystem( vector< PlanetData >& planetData )
 {
   {
     PlanetData data;
@@ -75,7 +166,7 @@ void PhysicalData::setupRealisticSolarSystem( vector< PlanetData >& planetData )
     data.mass = 0.330e24f / Phys::PhysicalConstants::S2kg; // Solar mass
     data.radius = 4.879e6f / 2.0f / Phys::PhysicalConstants::au2m; // au
     data.radius *= 1000.0f; // Så att nånting syns
-    const float speed = 47.9e3f / Phys::PhysicalConstants::au2m * Phys::PhysicalConstants::D2s; // au / D
+    const float speed = 47.4e3f / Phys::PhysicalConstants::au2m * Phys::PhysicalConstants::D2s; // au / D
     data.velocity = Eigen::Vector2f( 0.0f, speed );
     const float distance = 57.9e9f / Phys::PhysicalConstants::au2m; // au
     data.position = Eigen::Vector2f( -distance, 0.0f );
@@ -175,6 +266,30 @@ void PhysicalData::setupRealisticSolarSystem( vector< PlanetData >& planetData )
     data.velocity = Eigen::Vector2f( 0.0f, speed );
     const float distance = 0.0f; // au
     data.position = Eigen::Vector2f( -distance, 0.0f );
+    planetData.push_back( data );
+  }
+}
+
+void PhysicalData::setupAlotOfPlanets( vector< PlanetData >& planetData )
+{
+  random_device rd;
+  mt19937 gen( rd() );
+  uniform_real_distribution< float > randomSpeed( 0.0f, 1.0f );
+  uniform_real_distribution< float > randomAngle( 0.0f, 2.0f * float( M_PI ) );
+  uniform_real_distribution< float > randomPosition( -1.0e1f, 1.0e1f );
+
+  size_t nbOfPlanets = 500;
+  for( size_t i = 0; i < nbOfPlanets; ++i )
+  {
+    PlanetData data;
+    data.name = "Sun";
+    data.mass = 1.0e3f; // Solar mass
+    data.radius = 0.1f; // au
+
+    const float speed = randomSpeed( gen ); // au / D
+    const float angle = randomAngle( gen );
+    data.velocity = Eigen::Vector2f( speed * cos( angle ), speed * sin( angle ) );
+    data.position = Eigen::Vector2f( randomPosition( gen ), randomPosition( gen ) );
     planetData.push_back( data );
   }
 }
