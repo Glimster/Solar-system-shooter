@@ -148,8 +148,8 @@ void Space::buildScene_()
   }
 
   vector< PhysicalData::PlanetData > planetData;
-  //PhysicalData::setupRealisticSolarSystem( planetData );
-  PhysicalData::setupPlanetarySystem( planetData );
+  PhysicalData::setupRealisticSolarSystem( planetData );
+  //PhysicalData::setupPlanetarySystem( planetData );
   
   for( size_t i = 0; i < planetData.size(); ++i )
   {
