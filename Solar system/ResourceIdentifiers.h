@@ -14,13 +14,15 @@ namespace Textures
                   // Stars
                   Sun,
                   // Ships
-                  StarShip };
+                  StarShip,
+                  // Backgrounds
+                  Space };
 }
 
 // Forward declarations
 namespace sf
 {
-	class Texture;
+  class Texture;
 }
 
 template < typename Resource, typename Identifier >

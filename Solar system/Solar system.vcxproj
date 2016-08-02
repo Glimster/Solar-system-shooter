@@ -166,6 +166,7 @@
     <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="CoordinateSystemHandler.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="SpriteNode.h" />
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="MathUtil.h" />
     <ClInclude Include="MotionManager.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="Solar system shooter.cpp" />
     <ClCompile Include="Space.cpp" />
     <ClCompile Include="SpaceObject.cpp" />
+    <ClCompile Include="SpriteNode.cpp" />
     <ClCompile Include="StarShip.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

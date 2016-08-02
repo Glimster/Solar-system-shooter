@@ -33,21 +33,6 @@ StarShip::StarShip( float mass,
 StarShip::~StarShip()
 {}
 
-void StarShip::updateGraphics()
-{
-  Eigen::Vector2f positionInDisplayCS = position_;
-  csHandler_.convertToDisplayCS( positionInDisplayCS );
-  sprite_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
-
-  const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS( orientation_ );
-  sprite_.setRotation( angleInDisplayCS );
-}
-
-void StarShip::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
-{
-  target.draw( sprite_, states );
-}
-
 void StarShip::computeLinearForce( Eigen::Vector2f& force ) const
 {
   if( aftThrusters_ )
@@ -93,4 +78,18 @@ float StarShip::computeTorque() const
 unsigned int StarShip::getCategory() const
 {
   return Category::Player;
+}
+
+void StarShip::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
+{
+  target.draw(sprite_, states);
+}
+
+void StarShip::updateCurrentGraphics_()
+{
+  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
+  sprite_.setPosition(positionInDisplayCS(0), positionInDisplayCS(1));
+
+  const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS(orientation_);
+  sprite_.setRotation(angleInDisplayCS);
 }

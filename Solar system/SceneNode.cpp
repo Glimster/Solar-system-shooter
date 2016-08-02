@@ -54,7 +54,7 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
 {
   //states.transform *= getTransform();
 
-  drawCurrent( target, states );
+  drawCurrent_( target, states );
 
   for( const Ptr& child : children_ )
   {
@@ -62,5 +62,18 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
   }
 }
 
-void SceneNode::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
+void SceneNode::updateGraphics()
+{
+  updateCurrentGraphics_();
+  
+  for (const Ptr& child : children_)
+  {
+    child->updateGraphics();
+  }
+}
+
+void SceneNode::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const
+{}
+
+void SceneNode::updateCurrentGraphics_()
 {}

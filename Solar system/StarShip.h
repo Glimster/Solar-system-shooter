@@ -12,12 +12,9 @@ public:
   
   ~StarShip();
 
-  void updateGraphics();
-  void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
-
-  void computeLinearForce( Eigen::Vector2f& force ) const; // TODO, ta bort
-  void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const;
-  float computeTorque() const;
+  virtual void computeLinearForce( Eigen::Vector2f& force ) const override; // TODO, ta bort
+  virtual void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const override;
+  virtual float computeTorque() const override;
 
   void setAftThrusters( bool thrusters ) { aftThrusters_ = thrusters; }
   void setLeftRotationThrusters( bool thrusters ) { leftRotationThrusters_ = thrusters; }
@@ -27,6 +24,9 @@ public:
 
   friend class Game;
 private:
+  void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
+  void updateCurrentGraphics_();
+
   sf::Sprite sprite_;
 
   bool aftThrusters_;

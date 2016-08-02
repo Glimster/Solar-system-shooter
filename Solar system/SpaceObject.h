@@ -31,10 +31,6 @@ public:
   virtual void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const { fOverM.setZero(); };
   virtual float computeTorque() const { return 0.0f; };
 
-  // TODO, det här måste funderas på:
-  //virtual void updateGraphics() = 0; 
-  virtual void updateGraphics();
-
 protected:
   const CoordinateSystemHandler& csHandler_;
 

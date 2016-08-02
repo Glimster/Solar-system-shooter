@@ -6,6 +6,7 @@
 #include "SceneNode.h"
 #include "CommandQueue.h"
 #include "MotionManager.h"
+#include "PhysicalData.h"
 
 class SpaceObject;
 class StarShip;
@@ -13,7 +14,7 @@ class StarShip;
 class Space : sf::NonCopyable
 {
 public:
-  Space( sf::RenderWindow& mainWindow );
+  explicit Space( sf::RenderWindow& mainWindow );
   ~Space();
 
   void processEvents();
@@ -34,11 +35,13 @@ private:
   };
 
   void loadTextures_();
-  void buildScene_();
+  void buildScene_( const std::vector< PhysicalData::PlanetData >& planetarySystemData );
 
   sf::RenderWindow& mainWindow_;
-  CoordinateSystemHandler csHandler_;
   TextureHolder textureHolder_;
+
+  Eigen::AlignedBox2f spaceBoundingBox_; // TODO, currently not used
+  CoordinateSystemHandler csHandler_;
   sf::View playerView_;
 
   MotionManager motionManager_;
@@ -51,6 +54,7 @@ private:
   std::array< SceneNode*, LayerCount > sceneLayers_;
   SceneNode sceneGraph_;
 
+  // TODO: använd interface IMassive istället!
   std::vector< SpaceObject* > spaceObjects_; // Should contain all space objects
   StarShip* player_;
 };

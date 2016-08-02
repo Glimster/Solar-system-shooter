@@ -18,7 +18,6 @@ using namespace std;
 
 PhysicsTest::PhysicsTest( bool createGUI ):
   mainWindow_(),
-  GUIView_(),
   textureHolder_(),
   view_(),
   csHandler_(),
@@ -29,21 +28,15 @@ PhysicsTest::PhysicsTest( bool createGUI ):
   if( createGUI )
   {
     mainWindow_.create( sf::VideoMode::getDesktopMode(), "Physics test" );
-    GUIView_ = sf::View( mainWindow_.getDefaultView() );
+    view_ = sf::View( mainWindow_.getDefaultView() );
 
-    const float earthToSun = 1.0; // au
-    const float neptuneToSun = 30.0; // au
+    const float spaceLength = 50.0; // au
     const float screenWidth = mainWindow_.getDefaultView().getSize().x;
     const float screenHeight = mainWindow_.getDefaultView().getSize().y;
-    csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / ( neptuneToSun * 2.0f ),
+    csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / (spaceLength * 2.0f ),
       Eigen::Vector2f( screenWidth / 2.0f, screenHeight / 2.0f ) );
 
-    Eigen::Vector2f origo( 0.0f, 0.0f );
-    csHandler_.convertToDisplayCS( origo );
-    view_.setCenter( origo( 0 ), origo( 1 ) );
-
-    //const float height = earthToSun * 3.0f * csHandler_.unitOfLength2Pixel();
-    const float height = neptuneToSun * csHandler_.unitOfLength2Pixel();
+    const float height = spaceLength * csHandler_.unitOfLength2Pixel();
     const float width = height * screenWidth / screenHeight;
     view_.setSize( width, height );
 
@@ -316,10 +309,10 @@ void PhysicsTest::testGUI()
                                MotionManager::Technique::functor );
 
   vector< PhysicalData::PlanetData > spaceObjectData;
-  PhysicalData::setupHeavySunLightPlanet( spaceObjectData );
+  //PhysicalData::setupHeavySunLightPlanet( spaceObjectData );
   //PhysicalData::setupTwoBodySystem( spaceObjectData );
   //PhysicalData::setupThreeBodySystem( spaceObjectData );
-  //PhysicalData::setupAlotOfPlanets( spaceObjectData );
+  PhysicalData::setupAlotOfPlanets( spaceObjectData );
   buildScene_( spaceObjectData );
   const auto& sunData = spaceObjectData[0];
   const auto& sun = *spaceObjects_[0];
@@ -327,7 +320,7 @@ void PhysicsTest::testGUI()
 
   sf::Clock clock;
   sf::Time totalTime;
-  float timeScale = 5.0f;
+  float timeScale = 1.0f;
 
   sf::Time dt = sf::seconds( 1.0f / 50.0f );
   sf::Time timeSinceLastUpdate = sf::Time::Zero;
@@ -376,10 +369,7 @@ void PhysicsTest::render_()
   mainWindow_.clear( sf::Color::Black );
   mainWindow_.setView( view_ );
 
-  for( SpaceObject* obj : spaceObjects_ )
-  {
-    obj->updateGraphics();
-  }
+  sceneGraph_.updateGraphics();
   mainWindow_.draw( sceneGraph_ );
 
   //renderDebugPrintouts_();

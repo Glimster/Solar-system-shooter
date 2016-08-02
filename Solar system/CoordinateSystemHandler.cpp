@@ -19,16 +19,14 @@ CoordinateSystemHandler::CoordinateSystemHandler( float unitOfLength2Pixel, cons
 CoordinateSystemHandler::~CoordinateSystemHandler()
 {}
 
-void CoordinateSystemHandler::convertToDisplayCS( Eigen::Vector2f& position ) const
+Eigen::Vector2f CoordinateSystemHandler::convertToDisplayCS( const Eigen::Vector2f& position ) const
 {
-  position = position.cwiseProduct( unitOfLength2PixelV_ );
-  position += originInDisplayCS_;
+  return position.cwiseProduct( unitOfLength2PixelV_ ) + originInDisplayCS_;
 }
 
-void CoordinateSystemHandler::convertToWorldCS( Eigen::Vector2f& position ) const
+Eigen::Vector2f CoordinateSystemHandler::convertToWorldCS( const Eigen::Vector2f& position ) const
 {
-  position -= originInDisplayCS_;
-  position.cwiseQuotient( unitOfLength2PixelV_ );
+  return (position - originInDisplayCS_).cwiseQuotient( unitOfLength2PixelV_ );
 }
 
 float CoordinateSystemHandler::computeAngleInDisplayCS( const Eigen::Vector2f& orientationInWorldCS ) const

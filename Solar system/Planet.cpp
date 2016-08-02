@@ -24,19 +24,6 @@ Planet::Planet( const std::string& name, float mass, float radius,
 Planet::~Planet()
 {}
 
-void Planet::updateGraphics()
-{
-  Eigen::Vector2f positionInDisplayCS = position_;
-  csHandler_.convertToDisplayCS( positionInDisplayCS );
-
-  sprite_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
-}
-
-void Planet::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
-{
-  target.draw( sprite_, states );
-}
-
 Textures::ID Planet::toTextureID_() const
 {
   if( name_ == "Mercury" )
@@ -80,4 +67,15 @@ Textures::ID Planet::toTextureID_() const
     throw invalid_argument( "Missing texture " + name_ );
     return Textures::ID::Sun;
   }
+}
+
+void Planet::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
+{
+  target.draw(sprite_, states);
+}
+
+void Planet::updateCurrentGraphics_()
+{
+  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
+  sprite_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
 }

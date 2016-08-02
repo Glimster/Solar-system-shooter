@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Space.h"
 
+#include "SpriteNode.h"
 #include "Planet.h"
 #include "StarShip.h"
 
@@ -13,8 +14,9 @@ using namespace std;
 
 Space::Space( sf::RenderWindow& mainWindow ):
   mainWindow_( mainWindow ),
-  csHandler_(),
   textureHolder_(),
+  spaceBoundingBox_(),
+  csHandler_(),
   playerView_(),
   motionManager_( MotionManager::Integration::EulerForward, MotionManager::Technique::functor ),
   commandQueue_(),
@@ -23,26 +25,37 @@ Space::Space( sf::RenderWindow& mainWindow ):
   spaceObjects_(),
   player_()
 {
+  vector< PhysicalData::PlanetData > planetarySystemData;
+  PhysicalData::setupRealisticSolarSystem( planetarySystemData );
+  //PhysicalData::setupPlanetarySystem( planetarySystemData );
+  
   {
-    const float earthToSun = 1.0; // au
-    const float neptuneToSun = 30.0; // au
+    auto planetData = max_element( planetarySystemData.begin(), planetarySystemData.end(), []
+    ( const PhysicalData::PlanetData& pd1, const PhysicalData::PlanetData& pd2 ) 
+    {
+      return pd1.position.norm() < pd2.position.norm(); // TODO, assumes sun in the middle
+    } );
+    const float spaceLength = planetData->position.norm() * 2.0f; // a.u.
+    
+    auto lowerLeft = Eigen::Vector2f( -spaceLength / 2.0f, -spaceLength / 2.0f );
+    auto upperRight = Eigen::Vector2f( spaceLength / 2.0f, spaceLength / 2.0f );
+    spaceBoundingBox_ = Eigen::AlignedBox2f( lowerLeft, upperRight );
+
     const float screenWidth = mainWindow_.getDefaultView().getSize().x;
     const float screenHeight = mainWindow_.getDefaultView().getSize().y;
-    csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / ( neptuneToSun * 2.0f ), 
+    csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / spaceLength,
                                           Eigen::Vector2f( screenWidth / 2.0f, screenHeight / 2.0f ) );
 
-    Eigen::Vector2f origo( 0.0f, 0.0f );
-    csHandler_.convertToDisplayCS( origo );
-    playerView_.setCenter( origo(0), origo(1) );
-
-    const float height = earthToSun * 3.0f * csHandler_.unitOfLength2Pixel();
-    //const float height = neptuneToSun * csHandler_.unitOfLength2Pixel();
+    // Setup initial view
+    playerView_ = mainWindow_.getDefaultView();
+    // TODO, which size?
+    const float height = 3.0f * csHandler_.unitOfLength2Pixel();
     const float width = height * screenWidth / screenHeight;
     playerView_.setSize( width, height );
   }
 
   loadTextures_();
-  buildScene_();
+  buildScene_( planetarySystemData );
 }
 
 Space::~Space()
@@ -59,22 +72,19 @@ void Space::update( const sf::Time& timeStep )
     sceneGraph_.onCommand( commandQueue_.pop() );
   }
 
-  // TODO, städa upp detta och lägg på lämplig plats:
-  enum class Integration { EulerForward, RK4 };
-  enum class Technique { standard, lambda, functor };
-
   motionManager_.updateLinearMotion( dt, spaceObjects_ );
+  
   // TODO, stoppa in i MotionManager:
   { // Angular motion
-    Integration integration = Integration::EulerForward; // Must be sufficient
-    Technique technique = Technique::functor;
+    MotionManager::Integration integration = MotionManager::Integration::EulerForward; // Must be sufficient
+    MotionManager::Technique technique = MotionManager::Technique::functor;
 
     float dL, dTheta;
     switch( technique )
     {
-      case( Technique::standard ):
+      case( MotionManager::Technique::standard ):
       {
-        assert( integration != Integration::RK4 );
+        assert( integration != MotionManager::Integration::RK4 );
         const float torque = player_->computeTorque();
         dL = torque * dt;
 
@@ -82,19 +92,19 @@ void Space::update( const sf::Time& timeStep )
         dTheta = angularVelocity * dt;
         break;
       }
-      case( Technique::lambda ):
+      case( MotionManager::Technique::lambda ):
       {
-        assert( integration != Integration::RK4 );
+        assert( integration != MotionManager::Integration::RK4 );
         Integrator::N2RotEulerStepLambdas( *player_, dt, dL, dTheta );
         break;
       }
-      case( Technique::functor ):
+      case( MotionManager::Technique::functor ):
       {
-        if( integration == Integration::EulerForward ) {
+        if( integration == MotionManager::Integration::EulerForward ) {
           Integrator::N2RotEulerStepFunctor( *player_, dt, dL, dTheta );
         }
         else {
-          assert( integration == Integration::RK4 );
+          assert( integration == MotionManager::Integration::RK4 );
           Integrator::N2RotRK4StepFunctor( *player_, dt, dL, dTheta );
         }
         break;
@@ -113,11 +123,8 @@ void Space::render()
 {
   mainWindow_.setView( playerView_ );
 
-  // TODO, perhaps not so nice, consider alternative
-  for( SpaceObject* obj : spaceObjects_ )
-  {
-    obj->updateGraphics();
-  }
+  // TODO, the graphics could be updated in the draw command...
+  sceneGraph_.updateGraphics();
   mainWindow_.draw( sceneGraph_ );
 }
 
@@ -135,9 +142,11 @@ void Space::loadTextures_()
   textureHolder_.load( Textures::ID::Sun,       "Resources/Sun.jpg" );
 
   textureHolder_.load( Textures::ID::StarShip,  "Resources/StarShip.jpg" );
+
+  textureHolder_.load(Textures::ID::Space,      "Resources/Space.jpg");
 }
 
-void Space::buildScene_()
+void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetarySystemData )
 {
   // Add one empty SceneNode for each scene layer
   for( size_t i = 0; i < LayerCount; ++i )
@@ -147,13 +156,26 @@ void Space::buildScene_()
     sceneGraph_.attachChild( std::move( layer ) );
   }
 
-  vector< PhysicalData::PlanetData > planetData;
-  PhysicalData::setupRealisticSolarSystem( planetData );
-  //PhysicalData::setupPlanetarySystem( planetData );
+  { // Background
+    sf::Texture& texture = textureHolder_.get( Textures::ID::Space );
+    
+    // Relate to current view. TODO, support zooming etc.
+    auto scaleFactor = sf::Vector2f( playerView_.getSize().x / texture.getSize().x,
+                                     playerView_.getSize().y / texture.getSize().y );
+    // TODO, support repeated texture
+    //texture.setRepeated( true );
+    //sf::IntRect textureRect( 0, 0, ?, ? );
+    //unique_ptr< SpriteNode > background( new SpriteNode( texture, textureRect, scaleFactor ) );
+    unique_ptr< SpriteNode > background( new SpriteNode( texture, scaleFactor ) );
+
+    const auto origo = csHandler_.convertToDisplayCS( Eigen::Vector2f( 0.0f, 0.0f ) );
+    background->setPosition( origo(0), origo(1) );
+    sceneLayers_[Background]->attachChild( std::move( background ) );
+  }
   
-  for( size_t i = 0; i < planetData.size(); ++i )
+  for( size_t i = 0; i < planetarySystemData.size(); ++i )
   {
-    const PhysicalData::PlanetData& data = planetData[i];
+    const PhysicalData::PlanetData& data = planetarySystemData[i];
     unique_ptr< Planet > planet( new Planet( data.name, data.mass, data.radius, textureHolder_, csHandler_ ) );
     planet->setPosition( data.position );
     planet->setVelocity( data.velocity );

@@ -45,7 +45,7 @@ void Game::run()
   sf::Time timeSinceLastUpdate = sf::Time::Zero;
   while( mainWindow_.isOpen() )
   {
-    sf::Time elapsedAbsoluteTime = clock_.restart();
+    const sf::Time elapsedAbsoluteTime = clock_.restart();
     timeSinceLastUpdate += elapsedAbsoluteTime * Phys::PhysicalConstants::timeScale;
     
     while( timeSinceLastUpdate >= dt ) {
@@ -110,7 +110,7 @@ void Game::render()
 {
   mainWindow_.clear( sf::Color::Black );
   space_.render();
-  renderDebugPrintouts_();
+  renderDebugPrintouts_( true );
   mainWindow_.display();
 }
 
@@ -128,13 +128,14 @@ void Game::setupDebug_()
 
   fpsText_.setFont( font_ );
   fpsText_.setPosition( float( mainWindow_.getSize().y - 100 ), 0.0f );
-	fpsText_.setCharacterSize( 20 );
+  fpsText_.setCharacterSize( 20 );
 }
 
-void Game::renderDebugPrintouts_()
+void Game::renderDebugPrintouts_( bool onlyFPS )
 {
   mainWindow_.setView( GUIView_ );
 
+  if( !onlyFPS )
   { 
     // Time
     float days = totalTime_.asSeconds();

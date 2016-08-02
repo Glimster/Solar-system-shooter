@@ -3,7 +3,7 @@ class CoordinateSystemHandler
 {
 public:
   CoordinateSystemHandler();
-  CoordinateSystemHandler( float meterToPixel, const Eigen::Vector2f& originInDisplayCS );
+  CoordinateSystemHandler( float unitOfLength2Pixel, const Eigen::Vector2f& originInDisplayCS );
   ~CoordinateSystemHandler();
 
   inline float unitOfLength2Pixel() const { return unitOfLength2Pixel_; }
@@ -15,9 +15,10 @@ public:
   // |                     -------|------> x
   // |                            |
   // v  y                         |
-  void convertToDisplayCS( Eigen::Vector2f& position ) const;
-  void convertToWorldCS( Eigen::Vector2f& position ) const;
+  Eigen::Vector2f convertToDisplayCS( const Eigen::Vector2f& position ) const;
+  Eigen::Vector2f convertToWorldCS( const Eigen::Vector2f& position ) const;
 
+  // Also converts from radians to degrees
   float computeAngleInDisplayCS( const Eigen::Vector2f& orientationInWorldCS ) const;
 
 private:

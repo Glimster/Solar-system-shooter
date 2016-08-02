@@ -13,11 +13,10 @@ public:
 
   const std::string& getName() const { return name_; }
 
-  void updateGraphics();
   
-  void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
-
 private:
+  void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
+  void updateCurrentGraphics_();
 
   // Maps name to texture ID
   Textures::ID toTextureID_() const;

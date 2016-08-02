@@ -51,7 +51,6 @@ private:
   }
 
   sf::RenderWindow mainWindow_;
-  sf::View GUIView_;
   TextureHolder textureHolder_;
   sf::View view_;
   CoordinateSystemHandler csHandler_;

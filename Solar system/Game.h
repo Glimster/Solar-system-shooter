@@ -20,7 +20,7 @@ private:
   // Debug
   void setupDebug_();
   void updateFPSStats_( const sf::Time& elapsedTime );
-  void renderDebugPrintouts_();
+  void renderDebugPrintouts_( bool onlyFPS );
   std::string boolToString_( bool b ) const { return b ? "true" : "false"; }
 
   sf::RenderWindow mainWindow_;
