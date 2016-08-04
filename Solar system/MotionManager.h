@@ -1,8 +1,8 @@
 #pragma once
 
-class SpaceObject;
+class PhysicalObject;
 
-// TODO, hitta på bättre namn
+// TODO, hitta på bättre namn?
 class MotionManager
 {
 public:
@@ -14,8 +14,7 @@ public:
   ~MotionManager();
 
   void updateLinearMotion( const float dt,
-                           std::vector< SpaceObject* > spaceObjects );
-
+                           std::vector< PhysicalObject* > physicalObjects );
 private:
   Integration integration_;
   Technique technique_;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MathUtil.h"
 
+#include "PhysicalObject.h"
 #include "Physics.h" // TODO, can be removed later?
 
 using namespace std;
@@ -21,8 +22,7 @@ float MathUtil::circumferenceEllipse( float a, float b )
   return float( M_PI ) * ( 3 * ( a + b ) - sqrt( ( 3 * a + b ) * ( a + 3 * b ) ) );
 }
 
-
-void MathUtil::eulerStep( const vector< SpaceObject* >& objects, 
+void MathUtil::eulerStep( const vector< PhysicalObject* >& objects,
                           const float dt,
                           vector< Eigen::Vector2f >& drs, 
                           vector< Eigen::Vector2f >& dvs )
@@ -31,32 +31,31 @@ void MathUtil::eulerStep( const vector< SpaceObject* >& objects,
   dvs.resize( objects.size() );
   for( size_t i = 0; i != objects.size(); ++i )
   {
-    const float m1 = objects[i]->getMass();
     const Eigen::Vector2f& r1 = objects[i]->getPosition();
 
-    Eigen::Vector2f Ftot( 0.0f, 0.0f );
+    Eigen::Vector2f FOverMTot( 0.0f, 0.0f );
     for( size_t j = 0; j != objects.size(); ++j ) {
       if ( i == j )
         continue;
 
-      Eigen::Vector2f F( 0.0f, 0.0f );
-      Physics::forceOfGravity( m1, objects[j]->getMass(), r1 - objects[j]->getPosition(), F );
+      Eigen::Vector2f FOverM( 0.0f, 0.0f );
+      Physics::forceOfGravityOverM( objects[j]->getMass(), r1 - objects[j]->getPosition(), FOverM );
       
-      Ftot += F;
+      FOverMTot += FOverM;
     }
 
     // Thrusters
-    Eigen::Vector2f F2( 0.0f, 0.0f );
-    objects[i]->computeLinearForce( F2 );
+    Eigen::Vector2f FOverM2( 0.0f, 0.0f );
+    objects[i]->computeLinearForceOverM( FOverM2 );
 
-    Ftot += F2;
+    FOverMTot += FOverM2;
 
     drs[i] = objects[i]->getVelocity() * dt;
-    dvs[i] = Ftot / m1 * dt;
+    dvs[i] = FOverMTot * dt;
   }
 }
 
-void MathUtil::RK4Step( const vector< SpaceObject* >& objects, 
+void MathUtil::RK4Step( const vector< PhysicalObject* >& objects,
                         const float dt,
                         vector< Eigen::Vector2f >& drs, 
                         vector< Eigen::Vector2f >& dvs )
@@ -92,7 +91,7 @@ void MathUtil::RK4Step( const vector< SpaceObject* >& objects,
   }
 }
 
-void MathUtil::computeDerivatives_( const vector< SpaceObject* >& objects, 
+void MathUtil::computeDerivatives_( const vector< PhysicalObject* >& objects,
                                     const float dt,
                                     const vector< Eigen::Vector2f >& drdtIn, 
                                     const vector< Eigen::Vector2f >& dvdtIn,
@@ -107,26 +106,24 @@ void MathUtil::computeDerivatives_( const vector< SpaceObject* >& objects,
   }
 
   for( size_t i = 0; i < objects.size(); ++i ) {
-    const float m1 = objects[i]->getMass();
-
-    Eigen::Vector2f Ftot( 0.0f, 0.0f );
+    Eigen::Vector2f FOverMTot( 0.0f, 0.0f );
     for( size_t j = 0; j != objects.size(); ++j ) {
       if ( i == j )
         continue;
 
-      Eigen::Vector2f F;
-      Physics::forceOfGravity( m1, objects[j]->getMass(), rs[i] - rs[j], F );
+      Eigen::Vector2f FOverM;
+      Physics::forceOfGravityOverM( objects[j]->getMass(), rs[i] - rs[j], FOverM );
       
-      Ftot += F;
+      FOverMTot += FOverM;
     }
 
     // Thrusters
-    Eigen::Vector2f F2;
-    objects[i]->computeLinearForce( F2 );
+    Eigen::Vector2f FOverM2;
+    objects[i]->computeLinearForceOverM( FOverM2 );
 
-    Ftot += F2;
+    FOverMTot += FOverM2;
 
     drdtOut[i] = vs[i];
-    dvdtOut[i] = Ftot / m1;
+    dvdtOut[i] = FOverMTot;
   }
 }

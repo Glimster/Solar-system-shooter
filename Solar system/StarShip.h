@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ResourceIdentifiers.h"
-#include "SpaceObject.h"
+#include "GameEntity.h"
 
-class StarShip : public SpaceObject
+class StarShip : public GameEntity
 {
 public:
   StarShip( float mass,
@@ -12,7 +12,6 @@ public:
   
   ~StarShip();
 
-  virtual void computeLinearForce( Eigen::Vector2f& force ) const override; // TODO, ta bort
   virtual void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const override;
   virtual float computeTorque() const override;
 
@@ -22,7 +21,7 @@ public:
 
   unsigned int getCategory() const;
 
-  friend class Game;
+  friend class Game; // TODO, bara för debug antar jag
 private:
   void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
   void updateCurrentGraphics_();

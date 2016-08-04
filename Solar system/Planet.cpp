@@ -9,7 +9,7 @@ using namespace std;
 Planet::Planet( const std::string& name, float mass, float radius,
                 const TextureHolder& textureHolder,
                 const CoordinateSystemHandler& csHandler ):
-  SpaceObject( mass, csHandler ),
+  GameEntity( mass, csHandler ),
   name_( name ),
   sprite_( textureHolder.get( toTextureID_()) )
 {

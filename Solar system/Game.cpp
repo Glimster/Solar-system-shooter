@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
 
+#include "PhysicalObject.h"
 #include "Planet.h"
 #include "StarShip.h"
 
@@ -142,33 +143,33 @@ void Game::renderDebugPrintouts_( bool onlyFPS )
     string theString = "Elapsed time = " + to_string( days ) + " days\n";
 
     // Object data
-    const vector< SpaceObject* >& spaceObjects = space_.getSpaceObjects();
-    for( size_t i = 0; i < spaceObjects.size() - 1; ++i ) {
-      Eigen::Vector2f pos = spaceObjects[i]->getPosition();
+    const vector< PhysicalObject* >& physicalObjects = space_.getPhysicalObjects();
+    for( size_t i = 0; i < physicalObjects.size() - 1; ++i ) {
+      Eigen::Vector2f pos = physicalObjects[i]->getPosition();
 
-      float speed = sqrt( spaceObjects[i]->getVelocity()( 0 ) * spaceObjects[i]->getVelocity()( 0 ) + spaceObjects[i]->getVelocity()( 1 ) * spaceObjects[i]->getVelocity()( 1 ) );
+      float speed = sqrt( physicalObjects[i]->getVelocity()( 0 ) * physicalObjects[i]->getVelocity()( 0 ) + physicalObjects[i]->getVelocity()( 1 ) * physicalObjects[i]->getVelocity()( 1 ) );
       speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
-      theString.append( dynamic_cast<Planet*>( spaceObjects[i] )->getName() + " v = " + to_string( speed ) + " km/s" );
+      theString.append( dynamic_cast<Planet*>(physicalObjects[i] )->getName() + " v = " + to_string( speed ) + " km/s" );
 
-      float position = sqrt( spaceObjects[i]->getPosition()( 0 ) * spaceObjects[i]->getPosition()( 0 ) + spaceObjects[i]->getPosition()( 1 ) * spaceObjects[i]->getPosition()( 1 ) );
+      float position = sqrt( physicalObjects[i]->getPosition()( 0 ) * physicalObjects[i]->getPosition()( 0 ) + physicalObjects[i]->getPosition()( 1 ) * physicalObjects[i]->getPosition()( 1 ) );
       theString.append( ",  pos = " + to_string( position ) + " au" );
 
       theString.append( "\n" );
     }
 
-    //StarShip ship = *dynamic_cast< StarShip* >( spaceObjects[spaceObjects.size() - 1] );
-    Eigen::Vector2f pos = spaceObjects[spaceObjects.size() - 1]->getPosition();
+    //StarShip ship = *dynamic_cast< StarShip* >( physicalObjects[physicalObjects.size() - 1] );
+    Eigen::Vector2f pos = physicalObjects[physicalObjects.size() - 1]->getPosition();
 
-    float speed = sqrt( spaceObjects[spaceObjects.size() - 1]->getVelocity()( 0 ) * spaceObjects[spaceObjects.size() - 1]->getVelocity()( 0 ) + spaceObjects[spaceObjects.size() - 1]->getVelocity()( 1 ) * spaceObjects[spaceObjects.size() - 1]->getVelocity()( 1 ) );
+    float speed = sqrt( physicalObjects[physicalObjects.size() - 1]->getVelocity()( 0 ) * physicalObjects[physicalObjects.size() - 1]->getVelocity()( 0 ) + physicalObjects[physicalObjects.size() - 1]->getVelocity()( 1 ) * physicalObjects[physicalObjects.size() - 1]->getVelocity()( 1 ) );
     speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
     theString.append( "Player 1: v = " + to_string( speed ) + " km/s" );
 
-    float position = sqrt( spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 0 ) + spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) * spaceObjects[spaceObjects.size() - 1]->getPosition()( 1 ) );
+    float position = sqrt( physicalObjects[physicalObjects.size() - 1]->getPosition()( 0 ) * physicalObjects[physicalObjects.size() - 1]->getPosition()( 0 ) + physicalObjects[physicalObjects.size() - 1]->getPosition()( 1 ) * physicalObjects[physicalObjects.size() - 1]->getPosition()( 1 ) );
     theString.append( ",  pos = " + to_string( position ) + " au" );
 
-    theString.append( ", ft = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->aftThrusters_ ) );
-    theString.append( ", lt = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->leftRotationThrusters_ ) );
-    theString.append( ", rt = " + boolToString_( dynamic_cast<StarShip*>( spaceObjects[spaceObjects.size() - 1] )->rightRotationThrusters_ ) );
+    theString.append( ", ft = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->aftThrusters_ ) );
+    theString.append( ", lt = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->leftRotationThrusters_ ) );
+    theString.append( ", rt = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->rightRotationThrusters_ ) );
 
     theString.append( "\n" );
 

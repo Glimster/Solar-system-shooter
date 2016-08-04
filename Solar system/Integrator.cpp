@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "Integrator.h"
 
-#include "SpaceObject.h"
-
-#include "Physics.h"
+#include "PhysicalObject.h"
 #include "MathUtil.h"
 
 using namespace std;
 
-void Integrator::N2EulerStepLambdas( const vector< SpaceObject* >& objects, 
+void Integrator::N2EulerStepLambdas( const vector< PhysicalObject* >& objects,
                                      const float dt,
                                      vector< Eigen::Vector2f >& drs, 
                                      vector< Eigen::Vector2f >& dvs )
@@ -52,7 +50,7 @@ void Integrator::N2EulerStepLambdas( const vector< SpaceObject* >& objects,
   }
 }
 
-void Integrator::N2EulerStepFunctorsState( const vector< SpaceObject* >& objects, 
+void Integrator::N2EulerStepFunctorsState( const vector< PhysicalObject* >& objects,
                                            const float dt,
                                            vector< Eigen::Vector2f >& drs, 
                                            vector< Eigen::Vector2f >& dvs )
@@ -79,9 +77,9 @@ void Integrator::N2EulerStepFunctorsState( const vector< SpaceObject* >& objects
   }
 }
 
-void Integrator::N2RK4StepFunctors( const vector< SpaceObject* >& objects, 
+void Integrator::N2RK4StepFunctors( const vector< PhysicalObject* >& objects,
                                     const float dt,
-                                    vector< Eigen::Vector2f >& drs, 
+                                    vector< Eigen::Vector2f >& drs,
                                     vector< Eigen::Vector2f >& dvs )
 {
   const size_t nbOfObjects = objects.size();
@@ -122,7 +120,7 @@ void Integrator::N2RK4StepFunctors( const vector< SpaceObject* >& objects,
   }
 }
 
-void Integrator::N2RotEulerStepLambdas( const SpaceObject& object, 
+void Integrator::N2RotEulerStepLambdas( const PhysicalObject& object,
                                         const float dt,
                                         float& dL,
                                         float& dTheta )
@@ -140,7 +138,7 @@ void Integrator::N2RotEulerStepLambdas( const SpaceObject& object,
   dTheta = MathUtil::forwardEulerStep1d( omega, dt );
 }
 
-void Integrator::N2RotEulerStepFunctor( const SpaceObject& object, 
+void Integrator::N2RotEulerStepFunctor( const PhysicalObject& object,
                                         const float dt,
                                         float& dL,
                                         float& dTheta )
@@ -153,9 +151,9 @@ void Integrator::N2RotEulerStepFunctor( const SpaceObject& object,
   dTheta = MathUtil::forwardEulerStep1d( omega, dt );
 }
 
-void Integrator::N2RotRK4StepFunctor( const SpaceObject& object,
+void Integrator::N2RotRK4StepFunctor( const PhysicalObject& object,
                                       const float dt,
-                                      float& dL, 
+                                      float& dL,
                                       float& dTheta )
 {
   StateRot initialState = { object.getAngularMomentum(), object.getMomentOfInertia(), object.computeTorque() };

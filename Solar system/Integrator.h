@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Physics.h"
-
-class SpaceObject;
+class PhysicalObject;
 
 struct StateLin
 {
@@ -28,36 +27,35 @@ public:
   // Second order ODE
   
   // TODO, ta bort (även om snabbast) eftersom man inte kan återanvända lambdas!?
-  static void N2EulerStepLambdas( const std::vector< SpaceObject* >& objects, 
+  static void N2EulerStepLambdas( const std::vector< PhysicalObject* >& objects, 
                                   const float dt,
                                   std::vector< Eigen::Vector2f >& drs, 
                                   std::vector< Eigen::Vector2f >& dvs );
 
   // Använder funktorer med states
-  static void N2EulerStepFunctorsState( const std::vector< SpaceObject* >& objects, 
+  static void N2EulerStepFunctorsState( const std::vector< PhysicalObject* >& objects, 
                                         const float dt,
                                         std::vector< Eigen::Vector2f >& drs, 
                                         std::vector< Eigen::Vector2f >& dvs );
 
-  static void N2RK4StepFunctors( const std::vector< SpaceObject* >& objects, 
+  static void N2RK4StepFunctors( const std::vector< PhysicalObject* >& objects,
                                  const float dt,
-                                 std::vector< Eigen::Vector2f >& drs, 
+                                 std::vector< Eigen::Vector2f >& drs,
                                  std::vector< Eigen::Vector2f >& dvs );
-
   // Newton's second law for rotation
   //
   // Second order ODE
-  static void N2RotEulerStepLambdas( const SpaceObject& object, 
+  static void N2RotEulerStepLambdas( const PhysicalObject& object,
                                      const float dt,
                                      float& dL,
                                      float& dTheta );
 
-  static void N2RotEulerStepFunctor( const SpaceObject& object, 
+  static void N2RotEulerStepFunctor( const PhysicalObject& object, 
                                      const float dt,
                                      float& dL,
                                      float& dTheta );
 
-  static void N2RotRK4StepFunctor( const SpaceObject& object, 
+  static void N2RotRK4StepFunctor( const PhysicalObject& object,
                                    const float dt,
                                    float& dL,
                                    float& dTheta );

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Space.h"
 
+#include "PhysicalObject.h"
 #include "SpriteNode.h"
 #include "Planet.h"
 #include "StarShip.h"
@@ -18,11 +19,11 @@ Space::Space( sf::RenderWindow& mainWindow ):
   spaceBoundingBox_(),
   csHandler_(),
   playerView_(),
-  motionManager_( MotionManager::Integration::EulerForward, MotionManager::Technique::functor ),
+  motionManager_( MotionManager::Integration::RK4, MotionManager::Technique::functor ),
   commandQueue_(),
   sceneLayers_(),
   sceneGraph_(),
-  spaceObjects_(),
+  physicalObjects_(),
   player_()
 {
   vector< PhysicalData::PlanetData > planetarySystemData;
@@ -72,11 +73,11 @@ void Space::update( const sf::Time& timeStep )
     sceneGraph_.onCommand( commandQueue_.pop() );
   }
 
-  motionManager_.updateLinearMotion( dt, spaceObjects_ );
+  motionManager_.updateLinearMotion( dt, physicalObjects_ );
   
   // TODO, stoppa in i MotionManager:
   { // Angular motion
-    MotionManager::Integration integration = MotionManager::Integration::EulerForward; // Must be sufficient
+    MotionManager::Integration integration = MotionManager::Integration::RK4;
     MotionManager::Technique technique = MotionManager::Technique::functor;
 
     float dL, dTheta;
@@ -180,7 +181,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
     planet->setPosition( data.position );
     planet->setVelocity( data.velocity );
     
-    spaceObjects_.push_back( planet.get() );
+    physicalObjects_.push_back( planet.get() );
 
     sceneLayers_[ActionLayer]->attachChild( std::move( planet ) );
   }
@@ -194,7 +195,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
 
     player_ = player.get();
 
-    spaceObjects_.push_back( player.get() );
+    physicalObjects_.push_back( player.get() );
     sceneLayers_[ActionLayer]->attachChild( std::move( player ) );
   }
 }

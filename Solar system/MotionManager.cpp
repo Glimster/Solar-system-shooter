@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "MotionManager.h"
+
 #include "Integrator.h"
 #include "MathUtil.h"
+#include "PhysicalObject.h"
 
 using namespace std;
 
@@ -14,7 +16,7 @@ technique_( technique )
 MotionManager::~MotionManager() {}
 
 void MotionManager::updateLinearMotion( const float dt,
-                                        vector< SpaceObject* > spaceObjects )
+                                        vector< PhysicalObject* > physicalObjects )
 {
   vector< Eigen::Vector2f > drs, dvs;
   switch( technique_ )
@@ -22,18 +24,18 @@ void MotionManager::updateLinearMotion( const float dt,
   case( Technique::standard ) :
   {
     if( integration_ == Integration::EulerForward ) {
-      MathUtil::eulerStep( spaceObjects, dt, drs, dvs );
+      MathUtil::eulerStep( physicalObjects, dt, drs, dvs );
     }
     else {
       assert( integration_ == Integration::RK4 );
-      MathUtil::RK4Step( spaceObjects, dt, drs, dvs );
+      MathUtil::RK4Step( physicalObjects, dt, drs, dvs );
     }
     break;
   }
   case( Technique::lambda ) :
   {
     if( integration_ == Integration::EulerForward )
-      Integrator::N2EulerStepLambdas( spaceObjects, dt, drs, dvs );
+      Integrator::N2EulerStepLambdas( physicalObjects, dt, drs, dvs );
     else
       throw invalid_argument( "RK4 not implemented for lambdas" );
     break;
@@ -41,11 +43,11 @@ void MotionManager::updateLinearMotion( const float dt,
   case( Technique::functor ) :
   {
     if( integration_ == Integration::EulerForward ) {
-      Integrator::N2EulerStepFunctorsState( spaceObjects, dt, drs, dvs );
+      Integrator::N2EulerStepFunctorsState( physicalObjects, dt, drs, dvs );
     }
     else {
       assert( integration_ == Integration::RK4 );
-      Integrator::N2RK4StepFunctors( spaceObjects, dt, drs, dvs );
+      Integrator::N2RK4StepFunctors( physicalObjects, dt, drs, dvs );
     }
     break;
   }
@@ -54,8 +56,8 @@ void MotionManager::updateLinearMotion( const float dt,
     break;
   }
 
-  for( size_t i = 0; i != spaceObjects.size(); ++i )
+  for( size_t i = 0; i != physicalObjects.size(); ++i )
   {
-    spaceObjects[i]->updateState( drs[i], dvs[i] );
+    physicalObjects[i]->updateState( drs[i], dvs[i] );
   }
 }

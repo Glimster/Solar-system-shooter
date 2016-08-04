@@ -1,5 +1,5 @@
 #pragma once
-#include "SpaceObject.h"
+class PhysicalObject;
 
 class MathUtil
 {
@@ -39,15 +39,6 @@ public:
     return derivative() * dt;
   };
 
-  //template< typename FuncType >
-  //inline static Eigen::Vector2f forwardEulerStep( FuncType derivative,
-  //                                                const float dt )
-  //{
-  //  Eigen::Vector2f der( 0.0f, 0.0f );
-  //  derivative( der );
-  //  return der * dt;
-  //};
-
   template< typename FuncType >
   inline static Eigen::Vector2f forwardEulerStep( FuncType derivative,
                                                   const float dt )
@@ -55,7 +46,7 @@ public:
     return derivative() * dt;
   };
 
-  // TODO, av någon anledning så bli dr fel när denna används med funktorer (dock inte lambda)!?
+  // TODO, av någon anledning så bli det fel när denna används med funktorer (dock inte lambda)!?
   //template< typename FuncType >
   //inline static auto forwardEulerStep( FuncType derivative,
   //                                     const float dt ) -> decltype( derivative() * dt )
@@ -65,6 +56,7 @@ public:
   //  return derivative() * dt;
   //};
 
+  // TODO, går det att templatisera följande två?
   inline static float RK4Step( const float k1,
                                const float k2,
                                const float k3,
@@ -84,12 +76,11 @@ public:
   }
 
   // TODO, ta bort:
-  static void eulerStep( const std::vector< SpaceObject* >& objects, 
+  static void eulerStep( const std::vector< PhysicalObject* >& objects,
                          const float dt,
                          std::vector< Eigen::Vector2f >& drs, 
                          std::vector< Eigen::Vector2f >& dvs );
-  // TODO, ta bort:
-  static void RK4Step( const std::vector< SpaceObject* >& objects, 
+  static void RK4Step( const std::vector< PhysicalObject* >& objects,
                        const float dt,
                        std::vector< Eigen::Vector2f >& drs, 
                        std::vector< Eigen::Vector2f >& dvs );
@@ -97,7 +88,7 @@ public:
 private:
 
   // TODO, ta bort:
-  static void computeDerivatives_( const std::vector< SpaceObject* >& objects, 
+  static void computeDerivatives_( const std::vector< PhysicalObject* >& objects,
                                    const float dt,
                                    const std::vector< Eigen::Vector2f >& drdtIn, 
                                    const std::vector< Eigen::Vector2f >& dvdtIn,

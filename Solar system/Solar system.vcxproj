@@ -166,6 +166,9 @@
     <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="CoordinateSystemHandler.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameEntity.h" />
+    <ClInclude Include="Massive.h" />
+    <ClInclude Include="PhysicalObject.h" />
     <ClInclude Include="SpriteNode.h" />
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="MathUtil.h" />
@@ -180,7 +183,6 @@
     <ClInclude Include="ResourceIdentifiers.h" />
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Space.h" />
-    <ClInclude Include="SpaceObject.h" />
     <ClInclude Include="StarShip.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -190,11 +192,14 @@
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="CoordinateSystemHandler.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="Integrator.cpp" />
+    <ClCompile Include="Massive.cpp" />
     <ClCompile Include="MathUtil.cpp" />
     <ClCompile Include="MotionManager.cpp" />
     <ClCompile Include="PhysicalConstants.cpp" />
     <ClCompile Include="PhysicalData.cpp" />
+    <ClCompile Include="PhysicalObject.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsTest.cpp" />
     <ClCompile Include="Planet.cpp" />
@@ -202,7 +207,6 @@
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Solar system shooter.cpp" />
     <ClCompile Include="Space.cpp" />
-    <ClCompile Include="SpaceObject.cpp" />
     <ClCompile Include="SpriteNode.cpp" />
     <ClCompile Include="StarShip.cpp" />
     <ClCompile Include="stdafx.cpp">

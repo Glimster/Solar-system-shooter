@@ -8,7 +8,7 @@
 #include "MotionManager.h"
 #include "PhysicalData.h"
 
-class SpaceObject;
+class PhysicalObject;
 class StarShip;
 
 class Space : sf::NonCopyable
@@ -24,7 +24,7 @@ public:
   CommandQueue& getCommandQueue() { return commandQueue_; }
 
   // TODO, remove, for debug!
-  const std::vector< SpaceObject* >& getSpaceObjects() const { return spaceObjects_; } 
+  const std::vector< PhysicalObject* >& getPhysicalObjects() const { return physicalObjects_; }
 
 private:
   enum Layer
@@ -48,14 +48,13 @@ private:
 
   CommandQueue commandQueue_;
 
-  // sceneGraph_ owns all SceneNodes (i.e. SpaceObjects) as children (and grandchildren etc.)
+  // sceneGraph_ owns all SceneNodes (i.e. PhysicalObject's) as children (and grandchildren etc.)
   // sceneLayers keeps pointers to the top SceneNode for each layer
   // NB, layerCount gets its number from its place (which should be last) in the enum
   std::array< SceneNode*, LayerCount > sceneLayers_;
   SceneNode sceneGraph_;
 
-  // TODO: använd interface IMassive istället!
-  std::vector< SpaceObject* > spaceObjects_; // Should contain all space objects
+  std::vector< PhysicalObject* > physicalObjects_; // Should contain all space objects
   StarShip* player_;
 };
 

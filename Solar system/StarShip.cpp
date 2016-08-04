@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "StarShip.h"
 
+#include "GameEntity.h"
 #include "Category.h"
 #include "CoordinateSystemHandler.h"
 #include "ResourceHolder.h"
@@ -11,7 +12,7 @@ using namespace std;
 StarShip::StarShip( float mass, 
                     const TextureHolder& textureHolder,
                     const CoordinateSystemHandler& csHandler ):
-  SpaceObject( mass, csHandler ),
+  GameEntity( mass, csHandler ),
   sprite_( textureHolder.get( Textures::ID::StarShip ) ),
   aftThrusters_( false ),
   leftRotationThrusters_( false ),
@@ -33,21 +34,9 @@ StarShip::StarShip( float mass,
 StarShip::~StarShip()
 {}
 
-void StarShip::computeLinearForce( Eigen::Vector2f& force ) const
-{
-  if( aftThrusters_ )
-  {
-    const float magnitude = mass_ * 0.0172f; // Will accelerate to v ~= 0.0172 in dt = 1
-    force = orientation_ * magnitude;
-  }
-  else 
-  {
-    force.setZero();
-  }
-}
-
 void StarShip::computeLinearForceOverM( Eigen::Vector2f& fOverM ) const
 {
+  // TODO, lägg in variabel kraft?
   if( aftThrusters_ )
   {
     const float magnitude = /*mass_ **/ 0.0172f; // Will accelerate to v ~= 0.0172 in dt = 1
@@ -63,6 +52,7 @@ float StarShip::computeTorque() const
 {
   float torque = 0.0f;
 
+  // TODO, lägg in variabel kraft?
   if( leftRotationThrusters_ )
   {
     torque += momentOfInertia_ * float( M_PI ) / 50.0f; // Will accelerate to w = pi/50 in dt = 1

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ResourceIdentifiers.h"
-#include "SpaceObject.h"
+#include "GameEntity.h"
 
-class Planet : public SpaceObject
+class Planet : public GameEntity
 {
 public:
   Planet( const std::string& name, float mass, float radius,
@@ -13,7 +13,6 @@ public:
 
   const std::string& getName() const { return name_; }
 
-  
 private:
   void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
   void updateCurrentGraphics_();

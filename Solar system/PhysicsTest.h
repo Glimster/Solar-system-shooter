@@ -6,8 +6,9 @@
 #include "CoordinateSystemHandler.h"
 #include "PhysicalData.h"
 
-class SpaceObject;
+class PhysicalObject;
 
+// TODO, ta bort GUI från den här klassen!
 class PhysicsTest
 {
 public:
@@ -41,9 +42,6 @@ private:
 
   void render_();
 
-  void loadTextures_();
-  void buildScene_();
-
   // TODO, stoppa den här på lämpligt ställe!
   static void PVAR( Eigen::Vector2f v, std::string str )
   {
@@ -55,11 +53,11 @@ private:
   sf::View view_;
   CoordinateSystemHandler csHandler_;
 
-  // sceneGraph_ owns all SceneNodes (i.e. SpaceObjects) as children (and grandchildren etc.)
+  // sceneGraph_ owns all SceneNodes (i.e. PhysicalObject's) as children (and grandchildren etc.)
   // sceneLayers keeps pointers to the top SceneNode for each layer
   // NB, layerCount gets its number from its place (which should be last) in the enum
   std::array< SceneNode*, LayerCount > sceneLayers_;
   SceneNode sceneGraph_;
 
-  std::vector< SpaceObject* > spaceObjects_;
+  std::vector< PhysicalObject* > physicalObjects_;
 };

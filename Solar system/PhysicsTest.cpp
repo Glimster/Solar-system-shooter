@@ -3,16 +3,15 @@
 
 #include <gtest/gtest.h>
 
-#include "SpaceObject.h"
-#include "Planet.h"
+#include "PhysicalObject.h"
 #include "Physics.h"
 #include "PhysicalData.h"
 #include "PhysicalConstants.h"
 #include "MathUtil.h"
-
-#include "CoordinateSystemHandler.h"
-
 #include "MotionManager.h"
+
+#include "Planet.h"
+#include "CoordinateSystemHandler.h"
 
 using namespace std;
 
@@ -23,7 +22,7 @@ PhysicsTest::PhysicsTest( bool createGUI ):
   csHandler_(),
   sceneLayers_(),
   sceneGraph_(),
-  spaceObjects_()
+  physicalObjects_()
 {
   if( createGUI )
   {
@@ -53,8 +52,8 @@ void PhysicsTest::keplersLawsForHeavySun()
                                MotionManager::Technique::functor );
 
   CoordinateSystemHandler csHandler;
-  vector< unique_ptr< SpaceObject > > planets;
-  spaceObjects_.clear();
+  vector< unique_ptr< PhysicalObject > > celestialBodies;
+  physicalObjects_.clear();
 
   vector< PhysicalData::PlanetData > spaceObjectData;
   PhysicalData::setupHeavySunLightPlanet( spaceObjectData );
@@ -62,17 +61,19 @@ void PhysicsTest::keplersLawsForHeavySun()
   for( auto& sod : spaceObjectData )
   {
     const PhysicalData::PlanetData& data = sod;
-    unique_ptr< SpaceObject > object( new SpaceObject( data.mass, csHandler ) );
+    unique_ptr< PhysicalObject > object( new PhysicalObject( data.mass ) );
     object->setPosition( data.position );
     object->setVelocity( data.velocity );
 
-    spaceObjects_.push_back( object.get() );
-    planets.push_back( std::move( object ) );
+    physicalObjects_.push_back( object.get() );
+
+    celestialBodies.push_back( std::move( object ) );
   }
-  const auto& sun = *planets[0];
-  const auto& planet = *planets[1];
+  const auto& sun = *celestialBodies[0];
+  const auto& planet = *celestialBodies[1];
 
   // Act
+  sf::Clock clock;
   size_t updates = 0;
   float totalTime = 0.0f;
   float distanceTravelled = 0.0f;
@@ -100,7 +101,7 @@ void PhysicsTest::keplersLawsForHeavySun()
   {
     updates++;
 
-    motionManager.updateLinearMotion( dt, spaceObjects_ );
+    motionManager.updateLinearMotion( dt, physicalObjects_ );
 
     auto r_prev = previousPosition - sun.getPosition();
     auto r = planet.getPosition() - sun.getPosition();
@@ -143,6 +144,7 @@ void PhysicsTest::keplersLawsForHeavySun()
     previousPosition = planet.getPosition();
   }
 
+  cout << "Simulation time = " << clock.getElapsedTime().asMilliseconds() << " ms" << endl;
   cout << "Number of steps = " << updates << endl;
   PhysicsTest::PVAR( planet.getPosition(), "Final position" );
   EXPECT_NEAR( ( startingPosition - planet.getPosition() ).norm(), 0.0, 1e-3 );
@@ -212,8 +214,8 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   MotionManager motionManager( MotionManager::Integration::RK4,
                                MotionManager::Technique::functor );
 
-  vector< unique_ptr< SpaceObject > > planets;
-  spaceObjects_.clear();
+  vector< unique_ptr< PhysicalObject > > celestialObjects;
+  physicalObjects_.clear();
 
   vector< PhysicalData::PlanetData > spaceObjectData;
   PhysicalData::setupHeavySunLightPlanet( spaceObjectData );
@@ -221,20 +223,20 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   for( auto& sod : spaceObjectData )
   {
     const PhysicalData::PlanetData& data = sod;
-    unique_ptr< SpaceObject > object( new SpaceObject( data.mass, csHandler_ ) );
+    unique_ptr< PhysicalObject > object( new PhysicalObject( data.mass ) );
     object->setPosition( data.position );
     object->setVelocity( data.velocity );
 
-    spaceObjects_.push_back( object.get() );
-    planets.push_back( std::move( object ) );
+    physicalObjects_.push_back( object.get() );
+    celestialObjects.push_back( std::move( object ) );
   }
-  const auto& sun = *planets[0];
-  const auto& planet = *planets[1];
+  const auto& sun = *celestialObjects[0];
+  const auto& planet = *celestialObjects[1];
 
   auto computeTotalKE = [&]()
   {
     float totalKE = 0.0f;
-    for( const auto& sp : spaceObjects_ )
+    for( const auto& sp : physicalObjects_ )
     {
       totalKE += Physics::kineticEnergy( sp->getMass(), sp->getVelocity() );
     }
@@ -244,25 +246,25 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   auto computeTotalPE = [&]() 
   {
     float totalPE = 0.0f;
-    for( size_t i = 0; i < spaceObjects_.size() - 1; ++i )
+    for( size_t i = 0; i < physicalObjects_.size() - 1; ++i )
     {
-      for( size_t j = i + 1; j < spaceObjects_.size(); ++j )
+      for( size_t j = i + 1; j < physicalObjects_.size(); ++j )
       {
-        const Eigen::Vector2f r = spaceObjects_[i]->getPosition() - spaceObjects_[j]->getPosition();
-        totalPE = Physics::gravitationalPotentialEnergy( spaceObjects_[i]->getMass(), spaceObjects_[j]->getMass(), r );
+        const Eigen::Vector2f r = physicalObjects_[i]->getPosition() - physicalObjects_[j]->getPosition();
+        totalPE = Physics::gravitationalPotentialEnergy( physicalObjects_[i]->getMass(), physicalObjects_[j]->getMass(), r );
       }
     }
     return totalPE;
   };
 
-  // Act
-  float totalAngle = 0.0f;
   PhysicsTest::PVAR( planet.getPosition(), "Initial position" );
-  auto initialR = planet.getPosition() - sun.getPosition();
-  cout << "Initial distance = " << initialR.norm() << endl;
+  cout << "Initial distance = " << ( planet.getPosition() - sun.getPosition() ).norm() << endl;
   const float initialEnergy = computeTotalPE() + computeTotalKE();
   cout << "Initial total energy = " << initialEnergy << endl;
 
+  // Act
+  sf::Clock clock;
+  float totalAngle = 0.0f;
   auto startingPosition = planet.getPosition();
   auto previousPosition = startingPosition;
   float dt = 1.0f / 1000.0f;
@@ -270,7 +272,7 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   int numberOfTurns = 1000;
   while( int( totalAngle / ( 2.0f * float( M_PI ) ) ) < numberOfTurns )
   {
-    motionManager.updateLinearMotion( dt, spaceObjects_ );
+    motionManager.updateLinearMotion( dt, physicalObjects_ );
 
     auto r_prev = previousPosition - sun.getPosition();
     auto r = planet.getPosition() - sun.getPosition();
@@ -292,6 +294,7 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   }
 
   cout << "---------------------------------------" << endl;
+  cout << "Simulation time = " << clock.getElapsedTime().asMilliseconds() << " ms" << endl;
   PhysicsTest::PVAR( planet.getPosition(), "Final position" );
 
   cout << "Total angle = " << totalAngle << endl;
@@ -314,9 +317,6 @@ void PhysicsTest::testGUI()
   //PhysicalData::setupThreeBodySystem( spaceObjectData );
   PhysicalData::setupAlotOfPlanets( spaceObjectData );
   buildScene_( spaceObjectData );
-  const auto& sunData = spaceObjectData[0];
-  const auto& sun = *spaceObjects_[0];
-  const auto& planet = *spaceObjects_[1];
 
   sf::Clock clock;
   sf::Time totalTime;
@@ -330,10 +330,23 @@ void PhysicsTest::testGUI()
     timeSinceLastUpdate += elapsedAbsoluteTime * timeScale;
     while( timeSinceLastUpdate >= dt )
     {
-      motionManager.updateLinearMotion( dt.asSeconds(), spaceObjects_ );
+      motionManager.updateLinearMotion( dt.asSeconds(), physicalObjects_ );
 
       timeSinceLastUpdate -= dt;
       totalTime += dt;
+    }
+
+    sf::Event event;
+    while( mainWindow_.pollEvent( event ) )
+    {
+      switch( event.type )
+      {
+        case sf::Event::Closed:
+        {
+          mainWindow_.close();
+          break;
+        }
+      }
     }
     
     render_();
@@ -350,7 +363,7 @@ void PhysicsTest::buildScene_( const std::vector< PhysicalData::PlanetData >& pl
     sceneGraph_.attachChild( std::move( layer ) );
   }
 
-  spaceObjects_.clear();
+  physicalObjects_.clear();
   for( size_t i = 0; i < planetData.size(); ++i )
   {
     const PhysicalData::PlanetData& data = planetData[i];
@@ -358,7 +371,7 @@ void PhysicsTest::buildScene_( const std::vector< PhysicalData::PlanetData >& pl
     planet->setPosition( data.position );
     planet->setVelocity( data.velocity );
 
-    spaceObjects_.push_back( planet.get() );
+    physicalObjects_.push_back( planet.get() );
 
     sceneLayers_[ActionLayer]->attachChild( std::move( planet ) );
   }
