@@ -52,7 +52,7 @@ unsigned int SceneNode::getCategory() const
 
 void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
 {
-  //states.transform *= getTransform();
+  states.transform *= transformable_.getTransform();
 
   drawCurrent_( target, states );
 

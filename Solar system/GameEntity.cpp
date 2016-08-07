@@ -2,9 +2,11 @@
 #include "GameEntity.h"
 
 
-GameEntity::GameEntity( float mass, const CoordinateSystemHandler& csHandler ):
+GameEntity::GameEntity( float mass, int hitPoints, const CoordinateSystemHandler& csHandler ):
   PhysicalObject( mass ),
-  csHandler_( csHandler )
+  SceneNode(),
+  csHandler_( csHandler ),
+  hitPoints_( hitPoints )
 {}
 
 GameEntity::~GameEntity()

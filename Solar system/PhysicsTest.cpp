@@ -367,7 +367,7 @@ void PhysicsTest::buildScene_( const std::vector< PhysicalData::PlanetData >& pl
   for( size_t i = 0; i < planetData.size(); ++i )
   {
     const PhysicalData::PlanetData& data = planetData[i];
-    unique_ptr< Planet > planet( new Planet( data.name, data.mass, data.radius, textureHolder_, csHandler_ ) );
+    unique_ptr< Planet > planet( new Planet( data.name, data.mass, data.radius, 0 /*TODO, borde inte behöva sätta detta*/, textureHolder_, csHandler_ ) );
     planet->setPosition( data.position );
     planet->setVelocity( data.velocity );
 

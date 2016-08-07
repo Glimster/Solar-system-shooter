@@ -19,13 +19,24 @@ namespace Textures
                   Space };
 }
 
+namespace Fonts
+{
+  enum ID
+  {
+    Main,
+  };
+}
+
+// TODO, varför behövs dessa? Förstår icke!
 // Forward declarations
 namespace sf
 {
   class Texture;
+  class Font;
 }
 
 template < typename Resource, typename Identifier >
 class ResourceHolder;
 
 typedef ResourceHolder< sf::Texture, Textures::ID > TextureHolder;
+typedef ResourceHolder< sf::Font, Fonts::ID > FontHolder;

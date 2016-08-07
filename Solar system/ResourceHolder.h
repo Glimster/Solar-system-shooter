@@ -14,7 +14,7 @@ public:
   const Resource& get( Identifier id ) const;
 
 private:
-  std::map< Identifier, std::unique_ptr< Resource > > mTextureMap_;
+  std::map< Identifier, std::unique_ptr< Resource > > mResourceMap_;
 };
 
 #include "ResourceHolder.inl"

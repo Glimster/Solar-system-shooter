@@ -1,6 +1,7 @@
 #pragma once
 class PhysicalObject;
 
+// TODO, ska detta också vara ett namespace, pss som Utilities? Verkar vara bättre c++-standard!
 class MathUtil
 {
 public:

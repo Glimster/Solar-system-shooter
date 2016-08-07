@@ -7,6 +7,7 @@ class Planet : public GameEntity
 {
 public:
   Planet( const std::string& name, float mass, float radius,
+          int hitPoints, // TODO, ska planeter ha hit points?
           const TextureHolder& textureHolder,
           const CoordinateSystemHandler& csHandler );
   ~Planet();

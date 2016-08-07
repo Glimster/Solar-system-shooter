@@ -14,7 +14,7 @@ class StarShip;
 class Space : sf::NonCopyable
 {
 public:
-  explicit Space( sf::RenderWindow& mainWindow );
+  explicit Space( sf::RenderWindow& mainWindow, FontHolder& fontHolder );
   ~Space();
 
   void processEvents();
@@ -39,6 +39,7 @@ private:
 
   sf::RenderWindow& mainWindow_;
   TextureHolder textureHolder_;
+  FontHolder& fontHolder_;
 
   Eigen::AlignedBox2f spaceBoundingBox_; // TODO, currently not used
   CoordinateSystemHandler csHandler_;

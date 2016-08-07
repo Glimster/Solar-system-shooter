@@ -23,8 +23,11 @@ private:
   void renderDebugPrintouts_( bool onlyFPS );
   std::string boolToString_( bool b ) const { return b ? "true" : "false"; }
 
+private:
   sf::RenderWindow mainWindow_;
   sf::View GUIView_;
+
+  FontHolder fontHolder_;
 
   Space space_;
 
@@ -42,7 +45,6 @@ private:
   sf::Time maxTimeStep_;
 
   // Debug
-  sf::Font font_;
   sf::Text debugText_;
   sf::Text fpsText_;
   sf::Time fpsUpdateTime_;

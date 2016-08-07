@@ -1,34 +1,47 @@
 #include "stdafx.h"
 #include "StarShip.h"
 
+#include "GameDataTables.h"
 #include "GameEntity.h"
 #include "Category.h"
 #include "CoordinateSystemHandler.h"
 #include "ResourceHolder.h"
 #include "Physics.h"
+#include "Utilities.h"
+#include "TextNode.h"
 
 using namespace std;
 
-StarShip::StarShip( float mass, 
+// Anonymous namespace to avoid name collission
+namespace
+{
+  const std::vector< StarShipData > Table = setupStarShipData();
+}
+
+StarShip::StarShip( Type type,
                     const TextureHolder& textureHolder,
+                    const FontHolder& fonts,
                     const CoordinateSystemHandler& csHandler ):
-  GameEntity( mass, csHandler ),
-  sprite_( textureHolder.get( Textures::ID::StarShip ) ),
+  GameEntity( Table[type].mass, Table[type].hitPoints, csHandler ),
+  type_( type ),
+  sprite_( textureHolder.get( Table[type].texture ) ),
   aftThrusters_( false ),
   leftRotationThrusters_( false ),
   rightRotationThrusters_( false )
 {
-  const float shipLength = 0.17f; // au, TODO, how big should it be?
-  const float shipWidth = shipLength * sprite_.getTextureRect().height / sprite_.getTextureRect().width;
-  const float scaleX = shipLength * csHandler_.unitOfLength2Pixel() / sprite_.getTextureRect().width;
+  const float shipWidth = Table[type].length * sprite_.getTextureRect().height / sprite_.getTextureRect().width;
+  const float scaleX = Table[type].length * csHandler_.unitOfLength2Pixel() / sprite_.getTextureRect().width;
   const float scaleY = shipWidth * csHandler_.unitOfLength2Pixel() / sprite_.getTextureRect().height;
-  sprite_.setScale( scaleX, scaleY );
+  transformable_.setScale( scaleX, scaleY );
 
-  sf::FloatRect bb = sprite_.getLocalBounds();
-  sprite_.setOrigin( bb.width / 2.0f, bb.height / 2.0f );
+  Utilities::centerOrigin( sprite_ );
+
+  unique_ptr< TextNode > healthDisplay( new TextNode( fonts, "" ) );
+  healthDisplay_ = healthDisplay.get();
+  attachChild( std::move( healthDisplay ) );
 
   // Approximate ship with rectangle
-  momentOfInertia_ = Physics::computeRotationalInertiaForRectangle( mass, shipLength, shipWidth );
+  momentOfInertia_ = Physics::computeRotationalInertiaForRectangle( Table[type].mass, Table[type].length, shipWidth );
 }
 
 StarShip::~StarShip()
@@ -72,14 +85,18 @@ unsigned int StarShip::getCategory() const
 
 void StarShip::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
 {
-  target.draw(sprite_, states);
+  target.draw( sprite_, states );
 }
 
 void StarShip::updateCurrentGraphics_()
 {
-  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  sprite_.setPosition(positionInDisplayCS(0), positionInDisplayCS(1));
+  const auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
+  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
 
-  const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS(orientation_);
-  sprite_.setRotation(angleInDisplayCS);
+  const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS( orientation_ );
+  transformable_.setRotation( angleInDisplayCS );
+
+  healthDisplay_->setString( to_string( getHitPoints() ) + " HP" );
+  healthDisplay_->setPosition( 0.f, 500.f ); // TODO, gör att texten snurrar runt skeppet. Fixa!
+  healthDisplay_->setRotation( -transformable_.getRotation() );
 }

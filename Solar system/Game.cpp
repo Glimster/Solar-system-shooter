@@ -12,21 +12,22 @@ using namespace std;
 Game::Game(void):
   mainWindow_( sf::VideoMode::getDesktopMode(), "Solar System" ),
   GUIView_( mainWindow_.getDefaultView() ),
-  space_( mainWindow_ ),
+  fontHolder_(),
+  space_( mainWindow_, fontHolder_ ),
   isPaused_( false ),
   clock_(),
   totalTime_( sf::Time::Zero ),
   maxTimeStep_( sf::seconds( 1.0f / 60.0f ) ), // TODO: how high can this value be set?
-  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 100.0f ),
-  //maxTimeStep_( sf::seconds( 1.0f / 60.0f ) / 10.0f ),
   // Debug
-  font_(),
   debugText_(),
   fpsText_(),
   fpsUpdateTime_(),
   fpsNumFrames_( 0 )
 {
   Phys::PhysicalConstants::timeScale = 10.0f;
+
+  // TODO, egentligen borde fonten läsas in här, inte i Space?
+  //fontHolder_.load( Fonts::Main, "Resources/garreg.ttf" );
 
   // Debug
   setupDebug_();
@@ -117,17 +118,11 @@ void Game::render()
 
 void Game::setupDebug_()
 {
-  bool result = font_.loadFromFile( "Resources/garreg.ttf" );
-  if( !result )
-  {
-    throw runtime_error( "Failed to load font" );
-  }
-
-  debugText_.setFont( font_ );
+  debugText_.setFont( fontHolder_.get( Fonts::Main ) );
   debugText_.setCharacterSize( 20 ); // in pixels, not points!
   debugText_.setColor( sf::Color::White );
 
-  fpsText_.setFont( font_ );
+  fpsText_.setFont( fontHolder_.get( Fonts::Main ) );
   fpsText_.setPosition( float( mainWindow_.getSize().y - 100 ), 0.0f );
   fpsText_.setCharacterSize( 20 );
 }

@@ -10,7 +10,7 @@ void ResourceHolder< Resource, Identifier >::load( Identifier id, const string& 
     throw runtime_error( "Failed to load resource " + filename );
   }
 
-  auto insertion = mTextureMap_.insert( make_pair( id, move( resource ) ) );
+  auto insertion = mResourceMap_.insert( make_pair( id, move( resource ) ) );
   assert( insertion.second );
 }
 
@@ -25,22 +25,22 @@ void ResourceHolder< Resource, Identifier >::load( Identifier id, const string& 
     throw runtime_error( "Failed to load resource " + filename );
   }
 
-  auto insertion = mTextureMap_.insert( make_pair( id, move( texture ) ) );
+  auto insertion = mResourceMap_.insert( make_pair( id, move( texture ) ) );
   assert( insertion.second );
 }
 
 template< typename Resource, typename Identifier >
 Resource& ResourceHolder< Resource, Identifier >::get( Identifier id )
 { 
-  auto texture = mTextureMap_.find( id );
-  assert( texture != mTextureMap_.end() );
+  auto texture = mResourceMap_.find( id );
+  assert( texture != mResourceMap_.end() );
   return *texture->second;
 }
 
 template< typename Resource, typename Identifier >
 const Resource& ResourceHolder< Resource, Identifier >::get( Identifier id ) const
 { 
-  auto texture = mTextureMap_.find( id );
-  assert( texture != mTextureMap_.end() );
+  auto texture = mResourceMap_.find( id );
+  assert( texture != mResourceMap_.end() );
   return *texture->second;
 }

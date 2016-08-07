@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO, ska man göra samma lösning här som för GameDataTables?
 class PhysicalData
 {
 public:

@@ -2,9 +2,7 @@
 
 struct Command;
 
-// TODO, ska jag använda Transformable? Skulle isf vara för att uppdatera tillstånd (positioner) för barnen,
-// som är beroende av föräldern...
-class SceneNode : /*public sf::Transformable,*/ public sf::Drawable, private sf::NonCopyable
+class SceneNode : public sf::Drawable, private sf::NonCopyable
 {
 public:
 	typedef std::unique_ptr< SceneNode > Ptr;
@@ -25,9 +23,13 @@ private:
   
   // TODO: currently separated, but right now it would be possible to always update the
   // graphics (sprites etc.) in drawCurrent_()
-  virtual void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
-  virtual void updateCurrentGraphics_();
+  virtual void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;  
+  virtual void updateCurrentGraphics_(); // Should update transformable_
 
+protected:
+  sf::Transformable transformable_;
+
+private:
   std::vector< Ptr > children_;
   SceneNode* parent_;
 };

@@ -13,9 +13,10 @@
 
 using namespace std;
 
-Space::Space( sf::RenderWindow& mainWindow ):
+Space::Space( sf::RenderWindow& mainWindow, FontHolder& fontHolder ):
   mainWindow_( mainWindow ),
   textureHolder_(),
+  fontHolder_( fontHolder ),
   spaceBoundingBox_(),
   csHandler_(),
   playerView_(),
@@ -56,6 +57,7 @@ Space::Space( sf::RenderWindow& mainWindow ):
   }
 
   loadTextures_();
+  fontHolder_.load( Fonts::Main, "Resources/garreg.ttf" ); // TODO, borde egentligen läsas in i Game, men då kraschar det eftersom den inte finns nu isf...
   buildScene_( planetarySystemData );
 }
 
@@ -177,7 +179,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
   for( size_t i = 0; i < planetarySystemData.size(); ++i )
   {
     const PhysicalData::PlanetData& data = planetarySystemData[i];
-    unique_ptr< Planet > planet( new Planet( data.name, data.mass, data.radius, textureHolder_, csHandler_ ) );
+    unique_ptr< Planet > planet( new Planet( data.name, data.mass, data.radius, 1000 /*TODO, ska planeter ha hit points?*/, textureHolder_, csHandler_ ) );
     planet->setPosition( data.position );
     planet->setVelocity( data.velocity );
     
@@ -187,8 +189,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
   }
 
   { // Create starship
-    const float mass = 1e-10f; // Solar mass
-    unique_ptr< StarShip > player( new StarShip( mass, textureHolder_, csHandler_ ) );
+    unique_ptr< StarShip > player( new StarShip( StarShip::Standard, textureHolder_, fontHolder_, csHandler_ ) );
     player->setPosition( Eigen::Vector2f( 1.0f, 1.0f ) );
     player->setVelocity( Eigen::Vector2f( 0.0f, 0.0f ) );
     player->setOrientation( Eigen::Vector2f( 1.0f, 0.0f ) );
