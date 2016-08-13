@@ -5,7 +5,7 @@ public:
   Massive( float mass );
   ~Massive();
 
-  float getMass() const { return mass_; }
+  virtual float getMass() const { return mass_; }
   float getMomentOfInertia() const { return momentOfInertia_; }
   float getAngularMomentum() const { return angularMomentum_; }
 

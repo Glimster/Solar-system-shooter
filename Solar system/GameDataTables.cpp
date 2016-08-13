@@ -2,6 +2,7 @@
 #include "GameDataTables.h"
 
 #include "StarShip.h"
+#include "Projectile.h"
 
 using namespace std;
 
@@ -12,6 +13,18 @@ const vector< StarShipData > setupStarShipData()
   data[StarShip::Standard].mass = 1e-10f; // Solar masses
   data[StarShip::Standard].length = 0.17f; // a.u.
   data[StarShip::Standard].texture = Textures::ID::StarShip;
+  data[StarShip::Standard].cannonBallLaunchSpeed = 0.05f; // a.u. / solar day
+
+  return data;
+}
+
+const vector< ProjectileData > setupProjectileData()
+{
+  vector< ProjectileData > data( Projectile::TypeCount );
+  data[Projectile::CannonBall].hitPoints = 10;
+  data[Projectile::CannonBall].mass = 1e-11f; // Solar masses
+  data[Projectile::CannonBall].radius = 0.02f; // a.u.
+  data[Projectile::CannonBall].texture = Textures::ID::Rock;
 
   return data;
 }

@@ -5,14 +5,14 @@ using namespace std;
 
 // TODO, inte så snyggt, kanske ska ha en initialize-metod?
 CoordinateSystemHandler::CoordinateSystemHandler():
-  unitOfLength2Pixel_( 1.0f ),
-  unitOfLength2PixelV_( Eigen::Vector2f( unitOfLength2Pixel_, -unitOfLength2Pixel_ ) ),
+  world2DisplayLength_( 1.0f ),
+  world2DisplayLengthV_( Eigen::Vector2f( world2DisplayLength_, -world2DisplayLength_ ) ),
   originInDisplayCS_( Eigen::Vector2f() )
 {}
 
-CoordinateSystemHandler::CoordinateSystemHandler( float unitOfLength2Pixel, const Eigen::Vector2f& originInDisplayCS ):
-  unitOfLength2Pixel_( unitOfLength2Pixel ),
-  unitOfLength2PixelV_( Eigen::Vector2f( unitOfLength2Pixel_, -unitOfLength2Pixel_ ) ),
+CoordinateSystemHandler::CoordinateSystemHandler( float world2DisplayLength, const Eigen::Vector2f& originInDisplayCS ):
+  world2DisplayLength_( world2DisplayLength ),
+  world2DisplayLengthV_( Eigen::Vector2f( world2DisplayLength_, -world2DisplayLength_ ) ),
   originInDisplayCS_( originInDisplayCS )
 {}
 
@@ -21,12 +21,12 @@ CoordinateSystemHandler::~CoordinateSystemHandler()
 
 Eigen::Vector2f CoordinateSystemHandler::convertToDisplayCS( const Eigen::Vector2f& position ) const
 {
-  return position.cwiseProduct( unitOfLength2PixelV_ ) + originInDisplayCS_;
+  return position.cwiseProduct( world2DisplayLengthV_ ) + originInDisplayCS_;
 }
 
 Eigen::Vector2f CoordinateSystemHandler::convertToWorldCS( const Eigen::Vector2f& position ) const
 {
-  return (position - originInDisplayCS_).cwiseQuotient( unitOfLength2PixelV_ );
+  return (position - originInDisplayCS_).cwiseQuotient( world2DisplayLengthV_ );
 }
 
 float CoordinateSystemHandler::computeAngleInDisplayCS( const Eigen::Vector2f& orientationInWorldCS ) const

@@ -53,9 +53,6 @@ private:
   sf::View view_;
   CoordinateSystemHandler csHandler_;
 
-  // sceneGraph_ owns all SceneNodes (i.e. PhysicalObject's) as children (and grandchildren etc.)
-  // sceneLayers keeps pointers to the top SceneNode for each layer
-  // NB, layerCount gets its number from its place (which should be last) in the enum
   std::array< SceneNode*, LayerCount > sceneLayers_;
   SceneNode sceneGraph_;
 

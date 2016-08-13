@@ -12,6 +12,7 @@
 
 #include "Planet.h"
 #include "CoordinateSystemHandler.h"
+#include "CommandQueue.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ PhysicsTest::PhysicsTest( bool createGUI ):
     csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / (spaceLength * 2.0f ),
       Eigen::Vector2f( screenWidth / 2.0f, screenHeight / 2.0f ) );
 
-    const float height = spaceLength * csHandler_.unitOfLength2Pixel();
+    const float height = spaceLength * csHandler_.world2DisplayLength();
     const float width = height * screenWidth / screenHeight;
     view_.setSize( width, height );
 
@@ -322,6 +323,7 @@ void PhysicsTest::testGUI()
   sf::Time totalTime;
   float timeScale = 1.0f;
 
+  CommandQueue commandQueue; // Not used
   sf::Time dt = sf::seconds( 1.0f / 50.0f );
   sf::Time timeSinceLastUpdate = sf::Time::Zero;
   while( mainWindow_.isOpen() )
@@ -331,6 +333,8 @@ void PhysicsTest::testGUI()
     while( timeSinceLastUpdate >= dt )
     {
       motionManager.updateLinearMotion( dt.asSeconds(), physicalObjects_ );
+
+      sceneGraph_.update( dt, commandQueue );
 
       timeSinceLastUpdate -= dt;
       totalTime += dt;
@@ -382,7 +386,6 @@ void PhysicsTest::render_()
   mainWindow_.clear( sf::Color::Black );
   mainWindow_.setView( view_ );
 
-  sceneGraph_.updateGraphics();
   mainWindow_.draw( sceneGraph_ );
 
   //renderDebugPrintouts_();

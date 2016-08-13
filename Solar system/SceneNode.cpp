@@ -6,9 +6,10 @@
 
 using namespace std;
 
-SceneNode::SceneNode():
+SceneNode::SceneNode( Category::Type category ):
   children_(),
-  parent_( nullptr )
+  parent_( nullptr ),
+  defaultCategory_( category )
 {}
 
 void SceneNode::attachChild( Ptr child )
@@ -31,23 +32,43 @@ SceneNode::Ptr SceneNode::detachChild( const SceneNode& node )
   return result;
 }
 
-void SceneNode::onCommand( const Command& command )
+void SceneNode::update( sf::Time dt, CommandQueue& commands )
+{
+  updateCurrent_( dt, commands );
+
+  for( const Ptr& child : children_ )
+  {
+    child->update( dt, commands );
+  }
+}
+
+void SceneNode::onCommand( const Command& command, sf::Time dt )
 {
   // NB, bitwise and intentional!
   if( getCategory() & command.category )
   {
-    command.action( *this );
+    command.action( *this, dt );
   }
 
   for( Ptr& child : children_ )
   {
-    child->onCommand( command );
+    child->onCommand( command, dt );
   }
 }
 
 unsigned int SceneNode::getCategory() const
 {
-  return Category::Scene;
+  return defaultCategory_;
+}
+
+void SceneNode::print( string& string ) const
+{
+  this->printCurrent_( string );
+
+  for( const Ptr& child : children_ )
+  {
+    child->print( string );
+  }
 }
 
 void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
@@ -62,18 +83,22 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
   }
 }
 
-void SceneNode::updateGraphics()
-{
-  updateCurrentGraphics_();
-  
-  for (const Ptr& child : children_)
-  {
-    child->updateGraphics();
-  }
-}
-
 void SceneNode::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const
 {}
 
-void SceneNode::updateCurrentGraphics_()
+void SceneNode::updateCurrent_( sf::Time dt, CommandQueue& commands )
 {}
+
+void SceneNode::printCurrent_( string& string ) const
+{
+  string.append( "SceneNode: category = " + to_string( getCategory() ) );
+  printDefaultData_( string );
+  string.append( "\n" );
+}
+
+void SceneNode::printDefaultData_( string& string ) const
+{
+  string.append( ", #c = " + to_string( children_.size() ) );
+  if( parent_ == nullptr )
+    string.append( ". Top node!" );
+}

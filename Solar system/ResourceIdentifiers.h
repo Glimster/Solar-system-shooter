@@ -16,7 +16,9 @@ namespace Textures
                   // Ships
                   StarShip,
                   // Backgrounds
-                  Space };
+                  Space,
+                  // Projectiles
+                  Rock };
 }
 
 namespace Fonts

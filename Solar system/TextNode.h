@@ -10,12 +10,13 @@ public:
   explicit TextNode( const FontHolder& fonts, const std::string& text );
   ~TextNode();
 
-  inline void setPosition( float x, float y ) { transformable_.setPosition( x, y ); }
-  inline void setRotation( float rotation ) { transformable_.setRotation( rotation ); }
+  inline void setPositionDisplayCS( float x, float y ) { transformable_.setPosition( x, y ); }
+  inline void setRotationDisplayCS( float rotation ) { transformable_.setRotation( rotation ); }
   void setString( const std::string& text );
 
 private:
-  void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const;
+  void drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const override;
+  virtual void printCurrent_( std::string& string ) const override;
 
 private:
   sf::Text text_;

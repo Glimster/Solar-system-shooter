@@ -47,11 +47,10 @@ Space::Space( sf::RenderWindow& mainWindow, FontHolder& fontHolder ):
     const float screenHeight = mainWindow_.getDefaultView().getSize().y;
     csHandler_ = CoordinateSystemHandler( min( screenWidth, screenHeight ) / spaceLength,
                                           Eigen::Vector2f( screenWidth / 2.0f, screenHeight / 2.0f ) );
-
     // Setup initial view
     playerView_ = mainWindow_.getDefaultView();
     // TODO, which size?
-    const float height = 3.0f * csHandler_.unitOfLength2Pixel();
+    const float height = 2.0f * csHandler_.world2DisplayLength();
     const float width = height * screenWidth / screenHeight;
     playerView_.setSize( width, height );
   }
@@ -72,8 +71,10 @@ void Space::update( const sf::Time& timeStep )
   // eftersom jag inte använder dt!?!?!?
   while( !commandQueue_.isEmpty() )
   {
-    sceneGraph_.onCommand( commandQueue_.pop() );
+    sceneGraph_.onCommand( commandQueue_.pop(), timeStep );
   }
+
+  sceneGraph_.update( timeStep, commandQueue_ );
 
   motionManager_.updateLinearMotion( dt, physicalObjects_ );
   
@@ -125,9 +126,6 @@ void Space::update( const sf::Time& timeStep )
 void Space::render()
 {
   mainWindow_.setView( playerView_ );
-
-  // TODO, the graphics could be updated in the draw command...
-  sceneGraph_.updateGraphics();
   mainWindow_.draw( sceneGraph_ );
 }
 
@@ -147,6 +145,8 @@ void Space::loadTextures_()
   textureHolder_.load( Textures::ID::StarShip,  "Resources/StarShip.jpg" );
 
   textureHolder_.load(Textures::ID::Space,      "Resources/Space.jpg");
+
+  textureHolder_.load( Textures::ID::Rock,      "Resources/Rock.png" );
 }
 
 void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetarySystemData )
@@ -154,7 +154,9 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
   // Add one empty SceneNode for each scene layer
   for( size_t i = 0; i < LayerCount; ++i )
   {
-    SceneNode::Ptr layer( new SceneNode() );
+    Category::Type category = (i == ActionLayer) ? Category::Scene : Category::None;
+
+    SceneNode::Ptr layer( new SceneNode( category ) );
     sceneLayers_[i] = layer.get();
     sceneGraph_.attachChild( std::move( layer ) );
   }
@@ -163,6 +165,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
     sf::Texture& texture = textureHolder_.get( Textures::ID::Space );
     
     // Relate to current view. TODO, support zooming etc.
+    // TODO, kommer tryckas ihop lite...
     auto scaleFactor = sf::Vector2f( playerView_.getSize().x / texture.getSize().x,
                                      playerView_.getSize().y / texture.getSize().y );
     // TODO, support repeated texture
@@ -172,7 +175,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
     unique_ptr< SpriteNode > background( new SpriteNode( texture, scaleFactor ) );
 
     const auto origo = csHandler_.convertToDisplayCS( Eigen::Vector2f( 0.0f, 0.0f ) );
-    background->setPosition( origo(0), origo(1) );
+    background->setPositionDisplayCS( origo(0), origo(1) );
     sceneLayers_[Background]->attachChild( std::move( background ) );
   }
   
@@ -189,7 +192,7 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
   }
 
   { // Create starship
-    unique_ptr< StarShip > player( new StarShip( StarShip::Standard, textureHolder_, fontHolder_, csHandler_ ) );
+    unique_ptr< StarShip > player( new StarShip( StarShip::Standard, textureHolder_, fontHolder_, csHandler_, physicalObjects_ ) );
     player->setPosition( Eigen::Vector2f( 1.0f, 1.0f ) );
     player->setVelocity( Eigen::Vector2f( 0.0f, 0.0f ) );
     player->setOrientation( Eigen::Vector2f( 1.0f, 0.0f ) );

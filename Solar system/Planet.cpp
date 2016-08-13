@@ -17,8 +17,8 @@ Planet::Planet( const std::string& name, float mass, float radius,
   sprite_( textureHolder.get( toTextureID_()) )
 {
   // TODO, consider making utility function as well
-  const float scaleX = radius * csHandler_.unitOfLength2Pixel() * 2.0f / sprite_.getTextureRect().width;
-  const float scaleY = radius * csHandler_.unitOfLength2Pixel() * 2.0f / sprite_.getTextureRect().height;
+  const float scaleX = radius * csHandler_.world2DisplayLength() * 2.0f / sprite_.getTextureRect().width;
+  const float scaleY = radius * csHandler_.world2DisplayLength() * 2.0f / sprite_.getTextureRect().height;
   transformable_.setScale( scaleX, scaleY );
 
   Utilities::centerOrigin( sprite_ );
@@ -26,6 +26,30 @@ Planet::Planet( const std::string& name, float mass, float radius,
 
 Planet::~Planet()
 {}
+
+unsigned int Planet::getCategory() const
+{
+  return Category::Planet;
+}
+void Planet::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
+{
+  target.draw(sprite_, states);
+}
+
+void Planet::updateCurrent_( sf::Time dt, CommandQueue& commands )
+{
+  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
+  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
+}
+
+void Planet::printCurrent_( string& string ) const
+{
+  string.append( "Planet: category = " + to_string( getCategory() ) );
+  printDefaultData_( string );
+  string.append( ", " + name_ );
+  printPOData_( string );
+  string.append( "\n" );
+}
 
 Textures::ID Planet::toTextureID_() const
 {
@@ -70,15 +94,4 @@ Textures::ID Planet::toTextureID_() const
     throw invalid_argument( "Missing texture " + name_ );
     return Textures::ID::Sun;
   }
-}
-
-void Planet::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
-{
-  target.draw(sprite_, states);
-}
-
-void Planet::updateCurrentGraphics_()
-{
-  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
 }

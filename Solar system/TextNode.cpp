@@ -23,3 +23,11 @@ void TextNode::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states )
 {
   target.draw( text_, states );
 }
+
+void TextNode::printCurrent_( std::string& string ) const
+{
+  string.append( "TextNode: category = " + to_string( getCategory() ) );
+  printDefaultData_( string );
+  string.append( ", text = " + text_.getString() );
+  string.append( "\n" );
+}

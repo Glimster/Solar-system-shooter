@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "PhysicalObject.h"
 
+#include "Utilities.h"
 
+using namespace std;
 PhysicalObject::PhysicalObject( float mass ):
   Massive( mass ),
   position_( 0.0f, 0.0f ),
@@ -52,4 +54,12 @@ void PhysicalObject::rotate( float angle )
     orientation_(0) = newX;
     orientation_(1) = newY;
   }
+}
+
+void PhysicalObject::printPOData_( string& string ) const
+{
+  string.append( ", p = " + Utilities::toString( position_ ) );
+  string.append( ", v = " + Utilities::toString( velocity_ ) );
+  string.append( ", o = " + Utilities::toString( orientation_ ) );
+  string.append( ", mass = " + to_string( getMass() ) );
 }

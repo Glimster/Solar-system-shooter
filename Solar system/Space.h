@@ -25,7 +25,7 @@ public:
 
   // TODO, remove, for debug!
   const std::vector< PhysicalObject* >& getPhysicalObjects() const { return physicalObjects_; }
-
+  const SceneNode& getSceneGraph() const { return sceneGraph_; }
 private:
   enum Layer
   {
@@ -41,7 +41,7 @@ private:
   TextureHolder textureHolder_;
   FontHolder& fontHolder_;
 
-  Eigen::AlignedBox2f spaceBoundingBox_; // TODO, currently not used
+  Eigen::AlignedBox2f spaceBoundingBox_; // a.u.
   CoordinateSystemHandler csHandler_;
   sf::View playerView_;
 

@@ -112,7 +112,7 @@ void Game::render()
 {
   mainWindow_.clear( sf::Color::Black );
   space_.render();
-  renderDebugPrintouts_( true );
+  renderDebugPrintouts_( false );
   mainWindow_.display();
 }
 
@@ -130,45 +130,19 @@ void Game::setupDebug_()
 void Game::renderDebugPrintouts_( bool onlyFPS )
 {
   mainWindow_.setView( GUIView_ );
-
+  
   if( !onlyFPS )
-  { 
+  {
     // Time
     float days = totalTime_.asSeconds();
-    string theString = "Elapsed time = " + to_string( days ) + " days\n";
+    string timeString = "Elapsed time = " + to_string( days ) + " days\n";
 
-    // Object data
-    const vector< PhysicalObject* >& physicalObjects = space_.getPhysicalObjects();
-    for( size_t i = 0; i < physicalObjects.size() - 1; ++i ) {
-      Eigen::Vector2f pos = physicalObjects[i]->getPosition();
+    const SceneNode& sceneGraph = space_.getSceneGraph();
+    string sceneGraphStr = "SceneGraph:\n";
+    sceneGraph.print( sceneGraphStr );
 
-      float speed = sqrt( physicalObjects[i]->getVelocity()( 0 ) * physicalObjects[i]->getVelocity()( 0 ) + physicalObjects[i]->getVelocity()( 1 ) * physicalObjects[i]->getVelocity()( 1 ) );
-      speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
-      theString.append( dynamic_cast<Planet*>(physicalObjects[i] )->getName() + " v = " + to_string( speed ) + " km/s" );
-
-      float position = sqrt( physicalObjects[i]->getPosition()( 0 ) * physicalObjects[i]->getPosition()( 0 ) + physicalObjects[i]->getPosition()( 1 ) * physicalObjects[i]->getPosition()( 1 ) );
-      theString.append( ",  pos = " + to_string( position ) + " au" );
-
-      theString.append( "\n" );
-    }
-
-    //StarShip ship = *dynamic_cast< StarShip* >( physicalObjects[physicalObjects.size() - 1] );
-    Eigen::Vector2f pos = physicalObjects[physicalObjects.size() - 1]->getPosition();
-
-    float speed = sqrt( physicalObjects[physicalObjects.size() - 1]->getVelocity()( 0 ) * physicalObjects[physicalObjects.size() - 1]->getVelocity()( 0 ) + physicalObjects[physicalObjects.size() - 1]->getVelocity()( 1 ) * physicalObjects[physicalObjects.size() - 1]->getVelocity()( 1 ) );
-    speed *= Phys::PhysicalConstants::au2m / 1.0e3f / Phys::PhysicalConstants::D2s;
-    theString.append( "Player 1: v = " + to_string( speed ) + " km/s" );
-
-    float position = sqrt( physicalObjects[physicalObjects.size() - 1]->getPosition()( 0 ) * physicalObjects[physicalObjects.size() - 1]->getPosition()( 0 ) + physicalObjects[physicalObjects.size() - 1]->getPosition()( 1 ) * physicalObjects[physicalObjects.size() - 1]->getPosition()( 1 ) );
-    theString.append( ",  pos = " + to_string( position ) + " au" );
-
-    theString.append( ", ft = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->aftThrusters_ ) );
-    theString.append( ", lt = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->leftRotationThrusters_ ) );
-    theString.append( ", rt = " + boolToString_( dynamic_cast<StarShip*>(physicalObjects[physicalObjects.size() - 1] )->rightRotationThrusters_ ) );
-
-    theString.append( "\n" );
-
-    debugText_.setString( theString );
+    string debugString = timeString + sceneGraphStr;
+    debugText_.setString( debugString );
     mainWindow_.draw( debugText_ );
   }
 
