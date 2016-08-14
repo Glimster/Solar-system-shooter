@@ -65,7 +65,7 @@ StarShip::StarShip( Type type,
     // Set position relative star ship
     float pos = Table[type_].length * csHandler_.world2DisplayLength() / 2.0f;
     pos /= scaleX; // Scaling should not be done twice (since it is a child of the StarShip)
-    ball->setPositionDisplayCS( pos, 0.0f );
+    ball->setPositionDisplayCS( sf::Vector2f( pos, 0.0f ) );
 
     cannonBall_ = ball.get();
     attachChild( std::move( ball ) );
@@ -136,8 +136,9 @@ void StarShip::updateCurrent_( sf::Time dt, CommandQueue& commands )
 {
   checkProjectileLaunch_( dt, commands );
   
-  const auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
+  //const auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
+  //transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
+  transformable_.setPosition( csHandler_.convertToDisplayCS( position_ ) );
 
   const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS( orientation_ );
   transformable_.setRotation( angleInDisplayCS );

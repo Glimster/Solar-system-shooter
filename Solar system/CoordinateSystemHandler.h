@@ -15,9 +15,8 @@ public:
   // |                     -------|------> x
   // |                            |
   // v  y                         |
-  // TODO, dessa borde väl returnera en sf::Vector!?
-  Eigen::Vector2f convertToDisplayCS( const Eigen::Vector2f& position ) const;
-  Eigen::Vector2f convertToWorldCS( const Eigen::Vector2f& position ) const;
+  sf::Vector2f convertToDisplayCS( const Eigen::Vector2f& position ) const;
+  Eigen::Vector2f convertToWorldCS( const sf::Vector2f& position ) const;
 
   // Also converts from radians to degrees
   float computeAngleInDisplayCS( const Eigen::Vector2f& orientationInWorldCS ) const;

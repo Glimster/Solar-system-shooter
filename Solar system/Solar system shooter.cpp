@@ -23,12 +23,14 @@ int _tmain(int argc, _TCHAR* argv[])
       //testing::InitGoogleTest( &argc, argv );
       //return RUN_ALL_TESTS();
 
-      //PhysicsTest test( false );
+      PhysicsTest test( false );
       //test.keplersLawsForHeavySun();
       //test.testStabilityWRTTotalEnergy();
 
-      PhysicsTest test( true );
-      test.testGUI();
+      test.testPerformance();
+
+      //PhysicsTest test( true );
+      //test.testGUI();
     }
   }
   catch( exception& e )

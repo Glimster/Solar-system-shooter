@@ -54,8 +54,7 @@ void Projectile::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states
 
 void Projectile::updateCurrent_( sf::Time dt, CommandQueue& commands )
 {
-  const auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
+  transformable_.setPosition( csHandler_.convertToDisplayCS( position_ ) );
 }
 
 void Projectile::printCurrent_( string& string ) const

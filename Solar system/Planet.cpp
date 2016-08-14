@@ -38,8 +38,7 @@ void Planet::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) con
 
 void Planet::updateCurrent_( sf::Time dt, CommandQueue& commands )
 {
-  auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
+  transformable_.setPosition( csHandler_.convertToDisplayCS( position_ ) );
 }
 
 void Planet::printCurrent_( string& string ) const

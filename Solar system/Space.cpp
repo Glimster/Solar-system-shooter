@@ -174,8 +174,8 @@ void Space::buildScene_( const std::vector< PhysicalData::PlanetData >& planetar
     //unique_ptr< SpriteNode > background( new SpriteNode( texture, textureRect, scaleFactor ) );
     unique_ptr< SpriteNode > background( new SpriteNode( texture, scaleFactor ) );
 
-    const auto origo = csHandler_.convertToDisplayCS( Eigen::Vector2f( 0.0f, 0.0f ) );
-    background->setPositionDisplayCS( origo(0), origo(1) );
+    Eigen::Vector2f origo( 0.0f, 0.0f );
+    background->setPositionDisplayCS( csHandler_.convertToDisplayCS( origo ) );
     sceneLayers_[Background]->attachChild( std::move( background ) );
   }
   
