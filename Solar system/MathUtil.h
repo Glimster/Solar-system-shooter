@@ -29,7 +29,25 @@ public:
   template< typename VecType >
   inline static auto cross2D( const VecType& v1, VecType& v2 ) -> decltype( v1.norm() )
   {
-    return abs( v1( 0 ) * v2( 1 ) - v1( 1 ) * v2( 0 ) );
+    return abs( v1(0) * v2(1) - v1(1) * v2(0) );
+  }
+
+  // Counter clockwise rotation of vector
+  template< typename VecType >
+  inline static void rotate2D( VecType& vector, const float angle )
+  {
+    // Eigen for some reason almost 10 times slower!?
+#if 0
+    const Eigen::Rotation2D< float > rot( angle );
+    vector = rot * vector;
+#else
+    const float cosAngle = cos( angle );
+    const float sinAngle = sin( angle );
+    const float newX = vector(0) * cosAngle - vector(1) * sinAngle;
+    const float newY = vector(0) * sinAngle + vector(1) * cosAngle;
+    vector(0) = newX;
+    vector(1) = newY;
+#endif
   }
   
   // 

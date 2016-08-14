@@ -28,6 +28,8 @@ public:
   // Succeeds for RK4
   void testStabilityWRTTotalEnergy();
 
+  void testPerformance();
+
   void testGUI();
 
 private:

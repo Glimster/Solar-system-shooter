@@ -112,7 +112,7 @@ void Game::render()
 {
   mainWindow_.clear( sf::Color::Black );
   space_.render();
-  renderDebugPrintouts_( false );
+  renderDebugPrintouts_( true );
   mainWindow_.display();
 }
 

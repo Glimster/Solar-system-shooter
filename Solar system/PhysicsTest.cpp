@@ -9,6 +9,7 @@
 #include "PhysicalConstants.h"
 #include "MathUtil.h"
 #include "MotionManager.h"
+#include "Utilities.h"
 
 #include "Planet.h"
 #include "CoordinateSystemHandler.h"
@@ -305,6 +306,23 @@ void PhysicsTest::testStabilityWRTTotalEnergy()
   float finalEnergy = computeTotalPE() + computeTotalKE();
   cout << "Final total energy = " << finalEnergy << endl;
   EXPECT_NEAR( initialEnergy, finalEnergy, 1e-3 );
+}
+
+void PhysicsTest::testPerformance()
+{
+  size_t nbOfTimes = size_t( 1e8 );
+  const float angle = float( M_PI / 7.6f );
+
+  sf::Clock clock;
+  Eigen::Vector2f orientation( 1.0f, 0.0f );
+  for( size_t i = 0; i < nbOfTimes; ++i )
+  {
+    MathUtil::rotate2D( orientation, angle );
+  }
+
+  cout << "Simulation time = " << clock.getElapsedTime().asMilliseconds() << " ms" << endl;
+  cout << "Final orientation = " << Utilities::toString( orientation ) << endl;
+  cout << "Normalized: " << orientation.norm() << endl;
 }
 
 void PhysicsTest::testGUI()

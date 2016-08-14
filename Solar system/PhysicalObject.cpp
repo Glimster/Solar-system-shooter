@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PhysicalObject.h"
 
+#include "MathUtil.h"
 #include "Utilities.h"
 
 using namespace std;
@@ -36,24 +37,9 @@ void PhysicalObject::updateState( const Eigen::Vector2f& dr, const Eigen::Vector
   velocity_ += dv;
 }
 
-void PhysicalObject::rotate( float angle )
+void PhysicalObject::rotate( const float angle )
 {
-  if( false )
-  {
-    // TODO:
-    //Eigen::Rotation2D< float > rot( angle );
-    //orientation_ = orientation_ * rot;
-  }
-  else
-  {
-    const float cosAngle = cos( angle );
-    const float sinAngle = sin( angle );
-    float newX = orientation_(0) * cosAngle - orientation_(1) * sinAngle;
-    float newY = orientation_(0) * sinAngle + orientation_(1) * cosAngle;
-
-    orientation_(0) = newX;
-    orientation_(1) = newY;
-  }
+  MathUtil::rotate2D( orientation_, angle );
 }
 
 void PhysicalObject::printPOData_( string& string ) const

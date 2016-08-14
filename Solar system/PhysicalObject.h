@@ -16,7 +16,7 @@ public:
   void setOrientation( const Eigen::Vector2f& orientation );
 
   void updateState( const Eigen::Vector2f& dr, const Eigen::Vector2f& dv );
-  void rotate( float rotation );
+  void rotate( const float angle );
 
 protected:
   void printPOData_( std::string& string ) const;
