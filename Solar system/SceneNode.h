@@ -7,9 +7,11 @@ class CommandQueue;
 class SceneNode : public sf::Drawable, private sf::NonCopyable
 {
 public:
-	typedef std::unique_ptr< SceneNode > Ptr;
+  typedef std::unique_ptr< SceneNode > Ptr;
+  typedef std::pair< SceneNode*, SceneNode* > Pair;
 
-	SceneNode( Category::Type category = Category::None );
+public:
+  SceneNode( Category::Type category = Category::None );
 
   void attachChild( Ptr child );
   Ptr detachChild( const SceneNode& node );
@@ -19,6 +21,17 @@ public:
   // Excecutes command if the right category and the forwards to children
   void onCommand( const Command& command, sf::Time dt );
   virtual unsigned int getCategory() const;
+
+  // Kollisionskontrol från SFML-boken. Långsamt!
+  virtual sf::FloatRect	getBoundingRectDisplayCS() const;
+  sf::Transform	getWorldTransformDisplayCS() const;
+  const sf::Transform& getTransformDisplayCS() const { return transformable_.getTransform(); }
+  //bool collision( const SceneNode& left, const SceneNode& right ) const; // Använder CollisionControl istället. Kan vara static?
+  void checkSceneCollision( SceneNode& sceneGraph, std::set< Pair >& collisionPairs );
+  void checkNodeCollision( SceneNode& node, std::set< Pair >& collisionPairs );
+  void drawBoundingRect( sf::RenderTarget& target, sf::RenderStates states ) const;
+  virtual bool isDestroyed() const;
+
 
   void print( std::string& string ) const;
 

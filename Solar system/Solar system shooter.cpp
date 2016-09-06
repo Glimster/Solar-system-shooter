@@ -5,6 +5,7 @@
 #include "Game.h"
 
 #include "PhysicsTest.h"
+#include "GUITests.h"
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -20,17 +21,22 @@ int _tmain(int argc, _TCHAR* argv[])
     }
     else
     {
-      //testing::InitGoogleTest( &argc, argv );
-      //return RUN_ALL_TESTS();
-
-      PhysicsTest test( false );
-      //test.keplersLawsForHeavySun();
-      //test.testStabilityWRTTotalEnergy();
-
-      test.testPerformance();
-
-      //PhysicsTest test( true );
-      //test.testGUI();
+#if 1
+      testing::InitGoogleTest( &argc, argv );
+      return RUN_ALL_TESTS(); 
+#endif
+#if 0
+      PhysicsTest test;
+      //test.aLotOfPlanets();
+      //test.testPerformance();
+      //test.testSimpleCollision();
+#else
+      GUITests test;
+      //test.init( GUITests::Setup::Space );
+      //test.runSpaceSimulation();
+      test.init( GUITests::Setup::RollingBalls );
+      test.runCollisionSimulation();
+#endif
     }
   }
   catch( exception& e )

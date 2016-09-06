@@ -10,7 +10,7 @@
 #include "PhysicalConstants.h"
 #include "MathUtil.h"
 #include "Integrator.h"
-
+#include "CollisionControl.h"
 using namespace std;
 
 Space::Space( sf::RenderWindow& mainWindow, FontHolder& fontHolder ):
@@ -76,51 +76,10 @@ void Space::update( const sf::Time& timeStep )
 
   sceneGraph_.update( timeStep, commandQueue_ );
 
-  motionManager_.updateLinearMotion( dt, physicalObjects_ );
-  
-  // TODO, stoppa in i MotionManager:
-  { // Angular motion
-    MotionManager::Integration integration = MotionManager::Integration::RK4;
-    MotionManager::Technique technique = MotionManager::Technique::functor;
+  CollisionControl::handleCollisions( sceneGraph_ );
 
-    float dL, dTheta;
-    switch( technique )
-    {
-      case( MotionManager::Technique::standard ):
-      {
-        assert( integration != MotionManager::Integration::RK4 );
-        const float torque = player_->computeTorque();
-        dL = torque * dt;
-
-        const float angularVelocity = player_->getAngularMomentum() / player_->getMomentOfInertia();
-        dTheta = angularVelocity * dt;
-        break;
-      }
-      case( MotionManager::Technique::lambda ):
-      {
-        assert( integration != MotionManager::Integration::RK4 );
-        Integrator::N2RotEulerStepLambdas( *player_, dt, dL, dTheta );
-        break;
-      }
-      case( MotionManager::Technique::functor ):
-      {
-        if( integration == MotionManager::Integration::EulerForward ) {
-          Integrator::N2RotEulerStepFunctor( *player_, dt, dL, dTheta );
-        }
-        else {
-          assert( integration == MotionManager::Integration::RK4 );
-          Integrator::N2RotRK4StepFunctor( *player_, dt, dL, dTheta );
-        }
-        break;
-      }
-      default:
-        assert( false );
-        break;
-    }
-
-    player_->updateAngularMomentum( dL );
-    player_->rotate( dTheta );
-  }
+  motionManager_.computeLinearDynamics( dt, physicalObjects_ );
+  motionManager_.computeRotationalDynamics( dt, *player_ );
 }
 
 void Space::render()

@@ -7,14 +7,18 @@ class Physics
 public:
 
   // Force of gravity using Gaussian gravitational constant
-  // TODO, gör så den returnerar F. Påverkas performance?
-  inline static void forceOfGravityOverM( float m2, const Eigen::Vector2f& r, Eigen::Vector2f& F ) 
-  { 
-    const float force = Phys::PhysicalConstants::kSquared * m2 / r.dot( r );
-    
-    F = r;
+  inline static Eigen::Vector2f forceOfGravityOverM( float m2, const Eigen::Vector2f& r )
+  {
+    Eigen::Vector2f F = r;
     F.normalize();
+    const float force = Phys::PhysicalConstants::kSquared * m2 / r.dot( r );
     F *= -force;
+    return F;
+  }
+
+  inline static Eigen::Vector2f momentum( float m, const Eigen::Vector2f& v )
+  {
+    return m * v;
   }
 
   inline static float kineticEnergy( float m, const Eigen::Vector2f& v )
@@ -37,5 +41,15 @@ public:
   
   // Computes the escape velocity (really the speed) of a satellite around a large central mass
   static float escapeVelocity( const Eigen::Vector2f& relPos, float centralMass );
+
+  // Resulting velocities v1p and v2p of two circular objects colliding
+  static void elasticCollisionCircularObject( const Eigen::Vector2f& p1,
+                                              const Eigen::Vector2f& p2,
+                                              const Eigen::Vector2f& v1,
+                                              const Eigen::Vector2f& v2,
+                                              const float m1,
+                                              const float m2,
+                                              Eigen::Vector2f& v1p,
+                                              Eigen::Vector2f& v2p );
 };
 

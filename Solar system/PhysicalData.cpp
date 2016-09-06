@@ -272,6 +272,8 @@ void PhysicalData::setupRealisticSolarSystem( vector< PlanetData >& planetData )
 
 void PhysicalData::setupAlotOfPlanets( vector< PlanetData >& planetData )
 {
+  planetData.clear();
+
   random_device rd;
   mt19937 gen( rd() );
   uniform_real_distribution< float > randomSpeed( 0.0f, 1.0f );
@@ -291,5 +293,63 @@ void PhysicalData::setupAlotOfPlanets( vector< PlanetData >& planetData )
     data.velocity = Eigen::Vector2f( speed * cos( angle ), speed * sin( angle ) );
     data.position = Eigen::Vector2f( randomPosition( gen ), randomPosition( gen ) );
     planetData.push_back( data );
+  }
+}
+
+void PhysicalData::setupMovingAndStationaryBall( vector< BallData >& ballData )
+{
+  ballData.resize( 2 );
+
+  ballData[0].radius = 10.0f;
+  ballData[0].position = Eigen::Vector2f( -50.0f, 0.0f );
+  ballData[0].velocity = Eigen::Vector2f( 10.0f, 0.0f );
+
+  ballData[1].radius = 10.0f;
+  ballData[1].position = Eigen::Vector2f( 0.0f, 0.0f );
+  ballData[1].velocity = Eigen::Vector2f( 0.0f, 0.0f );
+}
+
+void PhysicalData::setupTwoBalls( vector< BallData >& ballData )
+{
+  ballData.resize( 2 );
+
+  ballData[0].radius = 20.0f;
+  ballData[0].position = Eigen::Vector2f( -100.0f, 15.0f );
+  ballData[0].velocity = Eigen::Vector2f( 10.0f, 5.0f );
+
+  ballData[1].radius = 10.0f;
+  ballData[1].position = Eigen::Vector2f( 0.0f, 0.0f );
+  ballData[1].velocity = Eigen::Vector2f( -11.0f, 14.0f );
+}
+
+void PhysicalData::setupALotOfBalls( vector< BallData >& ballData )
+{
+  ballData.clear();
+
+  random_device rd;
+  mt19937 gen( rd() );
+  uniform_real_distribution< float > randomRadius( 5.0f, 20.0f );
+  uniform_real_distribution< float > randomSpeed( 0.0f, 20.0f );
+  uniform_real_distribution< float > randomAngle( 0.0f, 2.0f * float( M_PI ) );
+  uniform_real_distribution< float > randomPosition( -400.0f, 400.0f );
+
+  size_t nbOfBalls = 500;
+  for( size_t i = 0; i < nbOfBalls; ++i )
+  {
+    BallData data;
+    data.radius = randomRadius( gen );
+    const float speed = randomSpeed( gen );
+    const float angle = randomAngle( gen );
+    data.velocity = Eigen::Vector2f( speed * cos( angle ), speed * sin( angle ) );
+    data.position = Eigen::Vector2f( randomPosition( gen ), randomPosition( gen ) );
+    ballData.push_back( data );
+  }
+
+  { // Big ball
+    BallData data;
+    data.radius = 100.0f;
+    data.velocity = Eigen::Vector2f( 300.0f, 0.0f );
+    data.position = Eigen::Vector2f( -1000.0f, 0.0f );
+    ballData.push_back( data );
   }
 }

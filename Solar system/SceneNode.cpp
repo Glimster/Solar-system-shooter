@@ -4,6 +4,8 @@
 #include "Command.h"
 #include "Category.h"
 
+#include "CollisionControl.h"
+
 using namespace std;
 
 SceneNode::SceneNode( Category::Type category ):
@@ -61,6 +63,73 @@ unsigned int SceneNode::getCategory() const
   return defaultCategory_;
 }
 
+sf::FloatRect SceneNode::getBoundingRectDisplayCS() const
+{
+  return sf::FloatRect();
+}
+
+sf::Transform SceneNode::getWorldTransformDisplayCS() const
+{
+  sf::Transform transform = sf::Transform::Identity;
+
+  for( const SceneNode* node = this; node != nullptr; node = node->parent_ )
+    transform = node->getTransformDisplayCS() * transform;
+
+  return transform;
+}
+
+//bool SceneNode::collision( const SceneNode& left, const SceneNode& right ) const
+//{
+//  return left.getBoundingRectDisplayCS().intersects( right.getBoundingRectDisplayCS() );
+//}
+
+void SceneNode::checkSceneCollision( SceneNode& sceneGraph, set< SceneNode::Pair >& collisionPairs )
+{
+  checkNodeCollision( sceneGraph, collisionPairs );
+
+  for( Ptr& child : sceneGraph.children_ )
+  {
+    checkSceneCollision( *child, collisionPairs );
+  }
+}
+
+void SceneNode::checkNodeCollision( SceneNode& node, set< SceneNode::Pair >& collisionPairs )
+{
+  if( this != &node &&
+      CollisionControl::isColliding( *this, node ) &&
+      //collision( *this, node ) &&
+      !isDestroyed() &&
+      !node.isDestroyed() )
+  {
+    // Inserts SceneNode pairs (always sorted the same way)
+    collisionPairs.insert( minmax( this, &node ) );
+  }
+ 
+  for( Ptr& child : children_ )
+  {
+    child->checkNodeCollision( node, collisionPairs );
+  }
+}
+
+void SceneNode::drawBoundingRect( sf::RenderTarget& target, sf::RenderStates ) const
+{
+  sf::FloatRect rect = getBoundingRectDisplayCS();
+
+  sf::RectangleShape shape;
+  shape.setPosition( sf::Vector2f( rect.left, rect.top ) );
+  shape.setSize( sf::Vector2f( rect.width, rect.height ) );
+  shape.setFillColor( sf::Color::Transparent );
+  shape.setOutlineColor( sf::Color::Green );
+  shape.setOutlineThickness( 1.f );
+
+  target.draw( shape );
+}
+
+bool SceneNode::isDestroyed() const
+{
+  return false;
+}
+
 void SceneNode::print( string& string ) const
 {
   this->printCurrent_( string );
@@ -81,6 +150,9 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
   {
     child->draw( target, states );
   }
+
+  //drawBoundingRect( target, states );
+
 }
 
 void SceneNode::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const

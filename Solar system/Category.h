@@ -12,5 +12,6 @@ namespace Category
     Player = 1 << 1,
     Projectile = 1 << 2,
     Planet = 1 << 3,
+    Ball = 1 << 4,
   };
 }

@@ -14,6 +14,7 @@ Planet::Planet( const std::string& name, float mass, float radius,
                 const CoordinateSystemHandler& csHandler ):
   GameEntity( mass, hitPoints, csHandler ),
   name_( name ),
+  radius_( radius ),
   sprite_( textureHolder.get( toTextureID_()) )
 {
   // TODO, consider making utility function as well
@@ -27,10 +28,16 @@ Planet::Planet( const std::string& name, float mass, float radius,
 Planet::~Planet()
 {}
 
+sf::FloatRect Planet::getBoundingRectDisplayCS() const
+{
+  return getWorldTransformDisplayCS().transformRect( sprite_.getGlobalBounds() );
+}
+
 unsigned int Planet::getCategory() const
 {
   return Category::Planet;
 }
+
 void Planet::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
 {
   target.draw(sprite_, states);

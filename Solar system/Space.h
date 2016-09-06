@@ -17,7 +17,7 @@ public:
   explicit Space( sf::RenderWindow& mainWindow, FontHolder& fontHolder );
   ~Space();
 
-  void processEvents();
+  //void processEvents();
   void update( const sf::Time& timeStep );
   void render();
 

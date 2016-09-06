@@ -49,70 +49,25 @@ public:
     vector(1) = newY;
 #endif
   }
-  
-  // 
+
   template< typename FuncType >
-  inline static float forwardEulerStep1d( FuncType derivative,
-                                          const float dt )
+  inline static auto forwardEulerStep( FuncType& derivative,
+                                       const float dt ) -> decltype( derivative() )
   {
     return derivative() * dt;
   };
 
-  template< typename FuncType >
-  inline static Eigen::Vector2f forwardEulerStep( FuncType derivative,
-                                                  const float dt )
+  template< typename IncrementType >
+  inline static auto RK4Step( const IncrementType k1,
+                              const IncrementType k2,
+                              const IncrementType k3,
+                              const IncrementType k4,
+                              const float dt ) -> decltype( k1 )
   {
-    return derivative() * dt;
-  };
-
-  // TODO, av någon anledning så bli det fel när denna används med funktorer (dock inte lambda)!?
-  //template< typename FuncType >
-  //inline static auto forwardEulerStep( FuncType derivative,
-  //                                     const float dt ) -> decltype( derivative() * dt )
-  //{
-  //  std::cout << "fes: der = " << derivative() << std::endl;
-  //  std::cout << "fes: dt = " << dt << std::endl;
-  //  return derivative() * dt;
-  //};
-
-  // TODO, går det att templatisera följande två?
-  inline static float RK4Step( const float k1,
-                               const float k2,
-                               const float k3,
-                               const float k4,
-                               const float dt )
-  {
-    return oneOverSix_ * ( k1 + 2.0f * ( k2 + k3 ) + k4 ) * dt;
+    return oneOverSix_ * (k1 + 2.0f * (k2 + k3) + k4) * dt;
   }
-
-  inline static Eigen::Vector2f RK4Step( const Eigen::Vector2f& k1,
-                                         const Eigen::Vector2f& k2,
-                                         const Eigen::Vector2f& k3,
-                                         const Eigen::Vector2f& k4,
-                                         const float dt )
-  {
-    return oneOverSix_ * ( k1 + 2.0f * ( k2 + k3 ) + k4 ) * dt;
-  }
-
-  // TODO, ta bort:
-  static void eulerStep( const std::vector< PhysicalObject* >& objects,
-                         const float dt,
-                         std::vector< Eigen::Vector2f >& drs, 
-                         std::vector< Eigen::Vector2f >& dvs );
-  static void RK4Step( const std::vector< PhysicalObject* >& objects,
-                       const float dt,
-                       std::vector< Eigen::Vector2f >& drs, 
-                       std::vector< Eigen::Vector2f >& dvs );
 
 private:
-
-  // TODO, ta bort:
-  static void computeDerivatives_( const std::vector< PhysicalObject* >& objects,
-                                   const float dt,
-                                   const std::vector< Eigen::Vector2f >& drdtIn, 
-                                   const std::vector< Eigen::Vector2f >& dvdtIn,
-                                   std::vector< Eigen::Vector2f >& drdtOut, 
-                                   std::vector< Eigen::Vector2f >& dvdtOut );
 
   static const float oneOverSix_;
 };

@@ -25,31 +25,29 @@ public:
   // Newton's second law
   //
   // Second order ODE
-  
-  // TODO, ta bort (även om snabbast) eftersom man inte kan återanvända lambdas!?
-  static void N2EulerStepLambdas( const std::vector< PhysicalObject* >& objects, 
-                                  const float dt,
-                                  std::vector< Eigen::Vector2f >& drs, 
-                                  std::vector< Eigen::Vector2f >& dvs );
+  static void N2EulerStep( const std::vector< PhysicalObject* >& objects,
+                           const float dt,
+                           std::vector< Eigen::Vector2f >& drs,
+                           std::vector< Eigen::Vector2f >& dvs );
+  static void N2RK4Step( const std::vector< PhysicalObject* >& objects,
+                         const float dt,
+                         std::vector< Eigen::Vector2f >& drs,
+                         std::vector< Eigen::Vector2f >& dvs );
 
   // Använder funktorer med states
-  static void N2EulerStepFunctorsState( const std::vector< PhysicalObject* >& objects, 
-                                        const float dt,
-                                        std::vector< Eigen::Vector2f >& drs, 
-                                        std::vector< Eigen::Vector2f >& dvs );
+  static void N2EulerStepFunctors( const std::vector< PhysicalObject* >& objects, 
+                                   const float dt,
+                                   std::vector< Eigen::Vector2f >& drs, 
+                                   std::vector< Eigen::Vector2f >& dvs );
 
   static void N2RK4StepFunctors( const std::vector< PhysicalObject* >& objects,
                                  const float dt,
                                  std::vector< Eigen::Vector2f >& drs,
                                  std::vector< Eigen::Vector2f >& dvs );
+  
   // Newton's second law for rotation
   //
   // Second order ODE
-  static void N2RotEulerStepLambdas( const PhysicalObject& object,
-                                     const float dt,
-                                     float& dL,
-                                     float& dTheta );
-
   static void N2RotEulerStepFunctor( const PhysicalObject& object, 
                                      const float dt,
                                      float& dL,
@@ -60,6 +58,15 @@ public:
                                    float& dL,
                                    float& dTheta );
 private:
+
+  // Computes dr/dt (=v) and dv/dt (=a) at time t + dt
+  // Helper class for the standard fourth order Runge-Kutta integrator
+  static void computeRK4Derivatives_( const std::vector< PhysicalObject* >& objects,
+                                      const float dt,
+                                      const std::vector< Eigen::Vector2f >& drdtIn,
+                                      const std::vector< Eigen::Vector2f >& dvdtIn,
+                                      std::vector< Eigen::Vector2f >& drdtOut,
+                                      std::vector< Eigen::Vector2f >& dvdtOut );
 
   // Computes dr/dt (=v) and dv/dt (=a) at time t + dt
   // Helper class for the fourth order Runge-Kutta integrator
@@ -90,10 +97,11 @@ class LinearForceOverM
 {
 public:
   LinearForceOverM( const std::vector< StateLin >& bodies, size_t index ):
-  bodies_( bodies ),
-  index_( index )
+    bodies_( bodies ),
+    index_( index )
   {}
 
+public:
   Eigen::Vector2f operator() ()
   {
     Eigen::Vector2f fOverM( 0.0f, 0.0f );
@@ -101,12 +109,8 @@ public:
       if ( index_ == j )
         continue;
 
-      Eigen::Vector2f forceOfGravityOverM( 0.0f, 0.0f );
-      Physics::forceOfGravityOverM( bodies_[j].mass, 
-                                    bodies_[index_].position - bodies_[j].position, 
-                                    forceOfGravityOverM );
-      
-      fOverM += forceOfGravityOverM;
+      fOverM += Physics::forceOfGravityOverM( bodies_[j].mass,
+                                              bodies_[index_].position - bodies_[j].position );
     }
 
     // Thrusters

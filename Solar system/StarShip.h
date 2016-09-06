@@ -31,6 +31,8 @@ public:
   virtual void computeLinearForceOverM( Eigen::Vector2f& fOverM ) const override;
   virtual float computeTorque() const override;
 
+  virtual sf::FloatRect getBoundingRectDisplayCS() const override;
+
   void setAftThrusters( bool thrusters ) { aftThrusters_ = thrusters; }
   void setLeftRotationThrusters( bool thrusters ) { leftRotationThrusters_ = thrusters; }
   void setRightRotationThrusters( bool thrusters ) { rightRotationThrusters_ = thrusters; }

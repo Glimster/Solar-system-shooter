@@ -13,6 +13,9 @@ public:
   ~Planet();
 
   const std::string& getName() const { return name_; }
+  float getRadius() const { return radius_; }
+  
+  virtual sf::FloatRect getBoundingRectDisplayCS() const override;
 
   virtual unsigned int getCategory() const override;
 private:
@@ -24,6 +27,7 @@ private:
   Textures::ID toTextureID_() const;
 
   std::string name_;
+  float radius_;
   sf::Sprite sprite_;
 };
 

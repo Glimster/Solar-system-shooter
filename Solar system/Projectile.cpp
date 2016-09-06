@@ -29,14 +29,19 @@ Projectile::Projectile( Type type, const TextureHolder& textureHolder, const Coo
 Projectile::~Projectile()
 {}
 
+float Projectile::getRadius() const
+{
+  return Table[type_].radius;
+}
+
 unsigned int Projectile::getCategory() const
 {
   return Category::Projectile;
 }
 
-sf::FloatRect Projectile::getBoundingRect() const
+sf::FloatRect Projectile::getBoundingRectDisplayCS() const
 {
-  return sprite_.getGlobalBounds(); // TODO, ehh?
+  return getWorldTransformDisplayCS().transformRect( sprite_.getGlobalBounds() );
 }
 
 //float Projectile::getMaxSpeed() const 

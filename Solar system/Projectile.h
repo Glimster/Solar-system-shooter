@@ -15,10 +15,12 @@ public:
   Projectile( Type type, const TextureHolder& textureHolder, const CoordinateSystemHandler& csHandler );
   ~Projectile();
 
+  float getRadius() const; // TODO, det här funkar bara nu, om det är en CannonBall. Styr upp!
+
   //void guideTowards( const sf::Vector2f& position ); 
   //bool isGuided() const; 
   virtual unsigned int getCategory() const override;
-  virtual sf::FloatRect getBoundingRect() const; 
+  virtual sf::FloatRect getBoundingRectDisplayCS() const; 
   //float getMaxSpeed() const; 
   int getDamage() const; 
 

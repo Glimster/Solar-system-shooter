@@ -6,54 +6,76 @@
 
 using namespace std;
 
-void Integrator::N2EulerStepLambdas( const vector< PhysicalObject* >& objects,
-                                     const float dt,
-                                     vector< Eigen::Vector2f >& drs, 
-                                     vector< Eigen::Vector2f >& dvs )
+void Integrator::N2EulerStep( const vector< PhysicalObject* >& objects,
+                            const float dt,
+                            vector< Eigen::Vector2f >& drs,
+                            vector< Eigen::Vector2f >& dvs )
 {
   drs.resize( objects.size() );
   dvs.resize( objects.size() );
   for( size_t i = 0; i != objects.size(); ++i )
-  { 
-    auto fOverM = [&]()
-    {
-      Eigen::Vector2f fOverM( 0.0f, 0.0f );
-      for( size_t j = 0; j != objects.size(); ++j ) {
-        if ( i == j )
-          continue;
+  {
+    const Eigen::Vector2f& r1 = objects[i]->getPosition();
 
-        Eigen::Vector2f forceOfGravityOverM( 0.0f, 0.0f );
-        Physics::forceOfGravityOverM( objects[j]->getMass(), 
-                                      objects[i]->getPosition() - objects[j]->getPosition(), 
-                                      forceOfGravityOverM );
-      
-        fOverM += forceOfGravityOverM;
-      }
+    Eigen::Vector2f FOverMTot( 0.0f, 0.0f );
+    for( size_t j = 0; j != objects.size(); ++j ) {
+      if( i == j )
+        continue;
 
-      // Thrusters
-      Eigen::Vector2f thrusterForceOverM( 0.0f, 0.0f );
-      objects[i]->computeLinearForceOverM( thrusterForceOverM );
+      FOverMTot += Physics::forceOfGravityOverM( objects[j]->getMass(), r1 - objects[j]->getPosition() );
+    }
 
-      fOverM += thrusterForceOverM;
+    // Thrusters
+    Eigen::Vector2f FOverM2( 0.0f, 0.0f );
+    objects[i]->computeLinearForceOverM( FOverM2 );
 
-      return fOverM;
-    };
+    FOverMTot += FOverM2;
 
-    dvs[i] = MathUtil::forwardEulerStep( fOverM, dt );
-
-    auto velocity = [&]()
-    {
-      return objects[i]->getVelocity();
-    };
-
-    drs[i] = MathUtil::forwardEulerStep( velocity, dt );
+    drs[i] = objects[i]->getVelocity() * dt;
+    dvs[i] = FOverMTot * dt;
   }
 }
 
-void Integrator::N2EulerStepFunctorsState( const vector< PhysicalObject* >& objects,
-                                           const float dt,
-                                           vector< Eigen::Vector2f >& drs, 
-                                           vector< Eigen::Vector2f >& dvs )
+void Integrator::N2RK4Step( const vector< PhysicalObject* >& objects,
+                            const float dt,
+                            vector< Eigen::Vector2f >& drs,
+                            vector< Eigen::Vector2f >& dvs )
+{
+  const size_t nbOfObjects = objects.size();
+
+  vector< Eigen::Vector2f > k1_r( nbOfObjects ), k1_v( nbOfObjects );
+  vector< Eigen::Vector2f > k2_r( nbOfObjects ), k2_v( nbOfObjects );
+  vector< Eigen::Vector2f > k3_r( nbOfObjects ), k3_v( nbOfObjects );
+  vector< Eigen::Vector2f > k4_r( nbOfObjects ), k4_v( nbOfObjects );
+
+  computeRK4Derivatives_( objects, 0.0f,
+                          vector< Eigen::Vector2f >( nbOfObjects ), vector< Eigen::Vector2f >( nbOfObjects ),
+                          k1_r, k1_v );
+
+  computeRK4Derivatives_( objects, 0.5f * dt,
+                          k1_r, k1_v,
+                          k2_r, k2_v );
+
+  computeRK4Derivatives_( objects, 0.5f * dt,
+                          k2_r, k2_v,
+                          k3_r, k3_v );
+
+  computeRK4Derivatives_( objects, dt,
+                          k3_r, k3_v,
+                          k4_r, k4_v );
+
+  drs.resize( objects.size() );
+  dvs.resize( objects.size() );
+  for( size_t i = 0; i < drs.size(); ++i ) {
+    drs[i] = 1.0f / 6.0f * (k1_r[i] + 2.0f * (k2_r[i] + k3_r[i]) + k4_r[i]) * dt;
+    dvs[i] = 1.0f / 6.0f * (k1_v[i] + 2.0f * (k2_v[i] + k3_v[i]) + k4_v[i]) * dt;
+  }
+}
+
+void Integrator::N2EulerStepFunctors( const vector< PhysicalObject* >& objects,
+                                      const float dt,
+                                      vector< Eigen::Vector2f >& drs, 
+                                      vector< Eigen::Vector2f >& dvs )
 {
   const size_t nbOfObjects = objects.size();
   vector< StateLin > initialStates( nbOfObjects );
@@ -120,24 +142,6 @@ void Integrator::N2RK4StepFunctors( const vector< PhysicalObject* >& objects,
   }
 }
 
-void Integrator::N2RotEulerStepLambdas( const PhysicalObject& object,
-                                        const float dt,
-                                        float& dL,
-                                        float& dTheta )
-{
-  auto tau = [&]()
-  {
-    return object.computeTorque();
-  };
-  dL = MathUtil::forwardEulerStep1d( tau, dt );
-
-  auto omega = [&]()
-  {
-    return object.getAngularMomentum() / object.getMomentOfInertia();
-  };    
-  dTheta = MathUtil::forwardEulerStep1d( omega, dt );
-}
-
 void Integrator::N2RotEulerStepFunctor( const PhysicalObject& object,
                                         const float dt,
                                         float& dL,
@@ -145,10 +149,10 @@ void Integrator::N2RotEulerStepFunctor( const PhysicalObject& object,
 {
   StateRot initialState = { object.getAngularMomentum(), object.getMomentOfInertia(), object.computeTorque() };
 
-  dL = MathUtil::forwardEulerStep1d( [&]() { return initialState.torque; }, dt );
+  dL = MathUtil::forwardEulerStep( [&]() { return initialState.torque; }, dt );
 
   AngularVelocity omega( initialState );
-  dTheta = MathUtil::forwardEulerStep1d( omega, dt );
+  dTheta = MathUtil::forwardEulerStep( omega, dt );
 }
 
 void Integrator::N2RotRK4StepFunctor( const PhysicalObject& object,
@@ -182,6 +186,39 @@ void Integrator::N2RotRK4StepFunctor( const PhysicalObject& object,
 }
 
 // ---------------------------------------------------------------------------
+void Integrator::computeRK4Derivatives_( const vector< PhysicalObject* >& objects,
+                                         const float dt,
+                                         const vector< Eigen::Vector2f >& drdtIn,
+                                         const vector< Eigen::Vector2f >& dvdtIn,
+                                         vector< Eigen::Vector2f >& drdtOut,
+                                         vector< Eigen::Vector2f >& dvdtOut )
+{
+  vector< Eigen::Vector2f > rs( objects.size() );
+  vector< Eigen::Vector2f > vs( objects.size() );
+  for( size_t i = 0; i < objects.size(); ++i ) {
+    rs[i] = objects[i]->getPosition() + drdtIn[i] * dt;
+    vs[i] = objects[i]->getVelocity() + dvdtIn[i] * dt;
+  }
+
+  for( size_t i = 0; i < objects.size(); ++i ) {
+    Eigen::Vector2f FOverMTot( 0.0f, 0.0f );
+    for( size_t j = 0; j != objects.size(); ++j ) {
+      if( i == j )
+        continue;
+
+      FOverMTot += Physics::forceOfGravityOverM( objects[j]->getMass(), rs[i] - rs[j] );
+    }
+
+    // Thrusters
+    Eigen::Vector2f FOverM2;
+    objects[i]->computeLinearForceOverM( FOverM2 );
+
+    FOverMTot += FOverM2;
+
+    drdtOut[i] = vs[i];
+    dvdtOut[i] = FOverMTot;
+  }
+}
 
 void Integrator::computeRK4Derivatives_( const StateRot& initialState,
                                          const float dt,

@@ -117,6 +117,13 @@ float StarShip::computeTorque() const
   return torque;
 }
 
+sf::FloatRect StarShip::getBoundingRectDisplayCS() const
+{
+  auto rect = sprite_.getGlobalBounds();
+  rect.width *= 0.5f; // Exclude front end to be able to launch projectile without collision. TODO, make something better!
+  return getWorldTransformDisplayCS().transformRect( rect );
+}
+
 void StarShip::fire()
 {
   isFiring_ = true;
@@ -127,7 +134,7 @@ unsigned int StarShip::getCategory() const
   return Category::Player;
 }
 
-void StarShip::drawCurrent_(sf::RenderTarget& target, sf::RenderStates states) const
+void StarShip::drawCurrent_( sf::RenderTarget& target, sf::RenderStates states ) const
 {
   target.draw( sprite_, states );
 }
@@ -136,12 +143,8 @@ void StarShip::updateCurrent_( sf::Time dt, CommandQueue& commands )
 {
   checkProjectileLaunch_( dt, commands );
   
-  //const auto positionInDisplayCS = csHandler_.convertToDisplayCS( position_ );
-  //transformable_.setPosition( positionInDisplayCS(0), positionInDisplayCS(1) );
   transformable_.setPosition( csHandler_.convertToDisplayCS( position_ ) );
-
-  const float angleInDisplayCS = csHandler_.computeAngleInDisplayCS( orientation_ );
-  transformable_.setRotation( angleInDisplayCS );
+  transformable_.setRotation( csHandler_.computeAngleInDisplayCS( orientation_ ) );
 
   {
     const float scale = 2.0f * PTable[Projectile::CannonBall].radius * csHandler_.world2DisplayLength() / cannonBall_->getTextureRect().width;
